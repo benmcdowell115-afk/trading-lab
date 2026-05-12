@@ -32,10 +32,16 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ valid: false, error: 'No license key provided' }) }
   }
 
+  // Allow a hardcoded test key for development/staging — remove before going live
+  const testKey = process.env.TEST_LICENSE_KEY
+  if (testKey && key === testKey) {
+    return { statusCode: 200, headers, body: JSON.stringify({ valid: true, status: 'active' }) }
+  }
+
   const apiKey = process.env.WHOP_API_KEY
   if (!apiKey) {
     console.error('WHOP_API_KEY is not set')
-    return { statusCode: 500, headers, body: JSON.stringify({ valid: false, error: 'Server configuration error' }) }
+    return { statusCode: 500, headers, body: JSON.stringify({ valid: false, error: 'Whop API key not configured yet' }) }
   }
 
   try {
