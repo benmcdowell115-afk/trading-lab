@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FlaskConical, Key, Check, ArrowRight, ExternalLink } from 'lucide-react'
+import { FlaskConical, Check, ArrowRight, ExternalLink } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 const WHOP_BUY_URL = import.meta.env.VITE_WHOP_BUY_URL as string | undefined
@@ -103,7 +103,6 @@ export function LoginScreen() {
 
               <div className="space-y-3">
                 <div className="relative">
-                  <Key size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
                   <input
                     type="text"
                     value={key}
@@ -116,7 +115,7 @@ export function LoginScreen() {
                     autoCorrect="off"
                     autoCapitalize="none"
                     data-form-type="other"
-                    className="w-full bg-slate-900 border border-slate-700/60 rounded-xl pl-10 pr-4 py-3 text-[13px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500/40 transition-colors tracking-widest"
+                    className="w-full bg-slate-900 border border-slate-700/60 rounded-xl px-4 py-3 text-[13px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500/40 transition-colors tracking-widest"
                     style={{ fontFamily: "'JetBrains Mono', monospace" }}
                   />
                 </div>
