@@ -173,7 +173,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
         </div>
 
         {/* Mobile kill zone clock */}
-        <div className="md:hidden px-4 pb-2">
+        <div className="md:hidden px-4 pb-2.5">
           <KillZoneClock />
         </div>
 
@@ -185,7 +185,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
               <button
                 key={id}
                 onClick={() => setTab(id)}
-                className={`flex-shrink-0 flex-1 min-w-[64px] flex items-center justify-center gap-1.5 py-2 md:py-2.5 text-[10px] md:text-[11.5px] font-semibold relative transition-all duration-150 border-b-2 px-2
+                className={`flex-shrink-0 flex-1 min-w-[46px] flex items-center justify-center gap-1.5 py-2 md:py-2.5 text-[10px] md:text-[11.5px] font-semibold relative transition-all duration-150 border-b-2 px-1.5 md:px-2
                   ${active
                     ? 'text-slate-100 border-amber-400 bg-slate-800/20'
                     : 'text-slate-600 border-transparent hover:text-slate-300 hover:bg-slate-800/10'

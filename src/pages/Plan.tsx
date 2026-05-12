@@ -259,7 +259,7 @@ export function Plan() {
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5">
+        <div className="flex-1 overflow-y-auto p-5 md:p-6">
 
           {/* SESSION PLAN */}
           {view === 'plan' && (
@@ -481,7 +481,7 @@ export function Plan() {
       </div>
 
       {/* ── Right: Summary card ──────────────────────────────────── */}
-      <div className="w-[280px] flex-shrink-0 bg-[#06060d] p-5 space-y-4 overflow-y-auto">
+      <div className="hidden md:block w-[280px] flex-shrink-0 bg-[#06060d] p-5 space-y-4 overflow-y-auto border-l border-slate-800/50">
         <h3 className="text-[13px] font-bold text-white">Today's Summary</h3>
         <div className="bg-[#0d0d16] border border-slate-800/60 rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">

@@ -74,60 +74,58 @@ export function LoginScreen() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-[#05050a] px-4">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(245,158,11,0.04)_0%,_transparent_70%)]" />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#05050a] px-5 py-10">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(245,158,11,0.05)_0%,_transparent_65%)]" />
 
-      <div className="relative w-full max-w-sm space-y-8 text-center">
+      <div className="relative w-full max-w-[360px] flex flex-col gap-7 text-center">
 
         {/* Logo */}
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/8 border border-amber-500/30 flex items-center justify-center shadow-2xl shadow-amber-500/10">
-            <FlaskConical size={28} className="text-amber-400" />
+          <div className="w-[72px] h-[72px] rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/8 border border-amber-500/30 flex items-center justify-center shadow-2xl shadow-amber-500/15">
+            <FlaskConical size={30} className="text-amber-400" />
           </div>
-          <div>
-            <p className="text-[22px] font-black tracking-widest text-slate-100 leading-none">TRADING LAB</p>
-            <p className="text-[11px] font-bold text-slate-600 tracking-[0.2em] mt-1.5">ICT · SMC · FUTURES</p>
+          <div className="space-y-1">
+            <p className="text-[24px] font-black tracking-widest text-slate-100 leading-none">TRADING LAB</p>
+            <p className="text-[11px] font-semibold text-slate-600 tracking-[0.22em]">ICT · SMC · FUTURES</p>
           </div>
         </div>
 
         {/* Card */}
-        <div className="bg-[#0c0c15] border border-slate-800/60 rounded-3xl p-7 shadow-2xl text-left space-y-5">
+        <div className="bg-[#0c0c15] border border-slate-800/60 rounded-3xl p-6 shadow-2xl text-left">
           {!done ? (
-            <>
-              <div>
-                <p className="text-[16px] font-bold text-white">Activate your copy</p>
-                <p className="text-[12px] text-slate-500 mt-1 leading-relaxed">
+            <div className="space-y-5">
+              <div className="space-y-1">
+                <p className="text-[17px] font-bold text-white">Activate your copy</p>
+                <p className="text-[12.5px] text-slate-500 leading-relaxed">
                   Paste the license key from your Whop dashboard below.
                 </p>
               </div>
 
               <div className="space-y-3">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={key}
-                    onChange={e => { setKey(e.target.value); setError('') }}
-                    onKeyDown={e => e.key === 'Enter' && activate()}
-                    placeholder="XXXX-XXXX-XXXX-XXXX"
-                    autoFocus
-                    spellCheck={false}
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="none"
-                    data-form-type="other"
-                    className="w-full bg-slate-900 border border-slate-700/60 rounded-xl px-4 py-3 text-[13px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500/40 transition-colors tracking-widest"
-                    style={{ fontFamily: "'JetBrains Mono', monospace" }}
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={key}
+                  onChange={e => { setKey(e.target.value); setError('') }}
+                  onKeyDown={e => e.key === 'Enter' && activate()}
+                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  autoFocus
+                  spellCheck={false}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  data-form-type="other"
+                  className="w-full bg-slate-900/80 border border-slate-700/60 rounded-xl px-4 py-3.5 text-[13px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors tracking-widest"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                />
 
                 {error && (
-                  <p className="text-[11px] text-red-400 leading-relaxed">{error}</p>
+                  <p className="text-[12px] text-red-400 leading-relaxed pl-1">{error}</p>
                 )}
 
                 <button
                   onClick={activate}
                   disabled={loading || !key.trim()}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500/15 border border-amber-500/35 text-amber-300 text-[13px] font-semibold hover:bg-amber-500/25 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-amber-500/15 border border-amber-500/35 text-amber-300 text-[13px] font-semibold hover:bg-amber-500/22 hover:border-amber-500/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {loading
                     ? <div className="w-4 h-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
@@ -138,33 +136,33 @@ export function LoginScreen() {
 
               {/* Buy link */}
               {WHOP_BUY_URL && (
-                <div className="text-center border-t border-slate-800/50 pt-4">
-                  <p className="text-[11px] text-slate-600 mb-2">Don't have a license?</p>
+                <div className="text-center border-t border-slate-800/50 pt-4 mt-1">
+                  <p className="text-[11.5px] text-slate-600 mb-2">Don't have a license?</p>
                   <a
                     href={WHOP_BUY_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-amber-400 hover:text-amber-300 transition-colors"
                   >
-                    Get access on Whop <ExternalLink size={11} />
+                    Get access on Whop <ExternalLink size={12} />
                   </a>
                 </div>
               )}
-            </>
+            </div>
           ) : (
-            <div className="text-center space-y-4 py-2">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center mx-auto">
-                <Check size={20} className="text-emerald-400" />
+            <div className="text-center space-y-4 py-4">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center mx-auto">
+                <Check size={22} className="text-emerald-400" />
               </div>
-              <div>
-                <p className="text-[15px] font-bold text-white">You're in</p>
-                <p className="text-[12px] text-slate-500 mt-2">Loading your data…</p>
+              <div className="space-y-1.5">
+                <p className="text-[16px] font-bold text-white">You're in</p>
+                <p className="text-[12.5px] text-slate-500">Loading your data…</p>
               </div>
             </div>
           )}
         </div>
 
-        <p className="text-[10px] text-slate-700 leading-relaxed">
+        <p className="text-[11px] text-slate-700 leading-relaxed px-2">
           Your builds, journal, and mastery progress sync across devices automatically.
         </p>
       </div>
