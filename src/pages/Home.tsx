@@ -17,7 +17,6 @@ const INSTRUMENTS: Instrument[] = ['NQ', 'ES', 'GC', 'SI']
 function getUpcomingDays() {
   const result: { date: Date; dateStr: string; dayName: string; events: string[]; isFOMC: boolean; isToday: boolean }[] = []
   const now = new Date()
-  const todayStr = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York' }).format(now).split('/').reverse().join('-').replace(/(\d{4})-(\d+)-(\d+)/, (_, y, m, d) => `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`)
 
   let offset = 0
   while (result.length < 5 && offset < 14) {

@@ -142,7 +142,6 @@ export function ConceptMap() {
             if (!a || !b) return null
             const active  = isEdgeActive(e)
             const inBuild = activeIds ? activeIds.includes(e.from) && activeIds.includes(e.to) : false
-            const ca = getConceptById(e.from)
             const strokeColor = active ? getNodeFill(e.from) : inBuild ? '#6b7280' : '#1e2030'
             const opacity = active  ? (e.strength === 3 ? 0.9 : e.strength === 2 ? 0.7 : 0.5)
                           : inBuild ? 0.35

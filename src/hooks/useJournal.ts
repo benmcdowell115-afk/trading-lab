@@ -61,7 +61,7 @@ export function useJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>(() => {
     try {
       const raw = JSON.parse(localStorage.getItem(KEY) ?? '[]') as JournalEntry[]
-      return raw.map(e => ({ mode: 'live' as JournalMode, ...e }))
+      return raw.map(e => ({ ...e, mode: e.mode ?? ('live' as JournalMode) }))
     } catch { return [] }
   })
 

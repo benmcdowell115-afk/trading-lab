@@ -147,7 +147,7 @@ export function JournalAnalytics({ entries }: Props) {
         <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4">
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4">Day of Week</p>
           <div className="space-y-2.5">
-            {dayStats.map(({ day, wins: dw, total: dt, rate }) => (
+            {dayStats.map(({ day, total: dt, rate }) => (
               <div key={day} className="flex items-center gap-2.5">
                 <span className="text-[11px] font-semibold text-slate-500 w-8">{day}</span>
                 <div className="flex-1 h-2 bg-slate-800/80 rounded-full overflow-hidden">

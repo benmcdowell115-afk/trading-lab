@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle, XCircle, RotateCcw, Trophy, Brain, Zap } from 'lucide-react'
 import { concepts } from '../data/concepts'
@@ -112,16 +112,18 @@ interface Props { open: boolean; onClose: () => void }
 
 export function QuizModal({ open, onClose }: Props) {
   const masteryData = useAllMastery()
-  const questions   = useMemo(() => buildWeightedQuestions(masteryData), [open, sessionKey])
 
   const ratedCount = concepts.filter(c => (masteryData[c.id] ?? 0) > 0).length
   const weakCount  = concepts.filter(c => (masteryData[c.id] ?? 0) > 0 && (masteryData[c.id] ?? 0) <= 2).length
 
-  const [idx,      setIdx]      = useState(0)
-  const [selected, setSelected] = useState<string | null>(null)
-  const [score,    setScore]    = useState(0)
-  const [done,     setDone]     = useState(false)
-  const [wrong,    setWrong]    = useState<string[]>([])  // conceptIds answered wrong
+  const [idx,        setIdx]        = useState(0)
+  const [selected,   setSelected]   = useState<string | null>(null)
+  const [score,      setScore]      = useState(0)
+  const [done,       setDone]       = useState(false)
+  const [wrong,      setWrong]      = useState<string[]>([])
+  const [sessionKey, setSessionKey] = useState(0)
+
+  const questions = useMemo(() => buildWeightedQuestions(masteryData), [open, sessionKey])
 
   const q       = questions[idx]
   const concept = q ? concepts.find(c => c.id === q.conceptId) : null
@@ -142,8 +144,6 @@ export function QuizModal({ open, onClose }: Props) {
     if (idx + 1 >= questions.length) { setDone(true); return }
     setIdx(i => i + 1); setSelected(null)
   }
-
-  const [sessionKey, setSessionKey] = useState(0)
 
   const restart = () => {
     setIdx(0); setSelected(null); setScore(0); setDone(false); setWrong([])
