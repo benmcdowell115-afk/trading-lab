@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { ChevronDown, ChevronUp, Wrench, Lightbulb, ListChecks, RefreshCw, Search } from 'lucide-react'
+import { ChevronDown, ChevronUp, Wrench, Lightbulb, ListChecks, RefreshCw } from 'lucide-react'
 import { tvInstructions } from '../data/tvInstructions'
 import { getConceptById } from '../data/concepts'
 import { useBuilds } from '../hooks/useBuilds'
@@ -181,22 +181,20 @@ export function Chart() {
 
           {/* Custom symbol input */}
           <div className="flex items-center gap-1.5">
-            <div className="relative">
-              <input
-                value={custom}
-                onChange={e => setCustom(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && applyCustom()}
-                placeholder="AAPL, TSLA…"
-                className="bg-slate-900/70 border border-slate-800 rounded-xl pl-3 pr-3 py-1.5 text-[12px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-slate-600 transition-all w-28"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              />
-            </div>
+            <input
+              value={custom}
+              onChange={e => setCustom(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && applyCustom()}
+              placeholder="AAPL, TSLA…"
+              className="bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-1.5 text-[12px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-slate-600 transition-all w-28"
+              style={{ fontFamily: "'JetBrains Mono', monospace" }}
+            />
             <button
               onClick={applyCustom}
               disabled={!custom.trim()}
-              className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200 transition-all disabled:opacity-30"
+              className="text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200 transition-all disabled:opacity-30"
             >
-              <Search size={11} /> Go
+              Go
             </button>
           </div>
 
@@ -218,18 +216,16 @@ export function Chart() {
             ))}
           </div>
 
-          {/* Current symbol + reload + mobile guide toggle */}
+          {/* Guide button (mobile prominent) + reload */}
           <div className="ml-auto flex items-center gap-2">
-            <span className="hidden sm:inline text-[11px] text-slate-600">
-              {activePreset ? `${activePreset.label} — ${activePreset.desc}` : symbol}
-              {' · '}{tf}m
-            </span>
             <button
               onClick={() => setGuideOpen(o => !o)}
-              className={`md:hidden flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border transition-all
-                ${guideOpen ? 'border-amber-500/40 bg-amber-500/10 text-amber-300' : 'border-slate-800 text-slate-500 hover:text-slate-300'}`}
+              className={`md:hidden flex items-center gap-2 text-[12px] font-bold px-4 py-2 rounded-xl border transition-all
+                ${guideOpen
+                  ? 'border-amber-500/60 bg-amber-500/20 text-amber-300'
+                  : 'border-amber-500/40 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20'}`}
             >
-              <Lightbulb size={11} /> Guide
+              <Lightbulb size={13} /> Drawing Guide
             </button>
             <button
               onClick={() => setChartKey(k => k + 1)}
