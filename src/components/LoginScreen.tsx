@@ -112,6 +112,10 @@ export function LoginScreen() {
                     placeholder="XXXX-XXXX-XXXX-XXXX"
                     autoFocus
                     spellCheck={false}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    data-form-type="other"
                     className="w-full bg-slate-900 border border-slate-700/60 rounded-xl pl-10 pr-4 py-3 text-[13px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500/40 transition-colors tracking-widest"
                     style={{ fontFamily: "'JetBrains Mono', monospace" }}
                   />
