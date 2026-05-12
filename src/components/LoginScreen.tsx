@@ -7,7 +7,7 @@ const WHOP_BUY_URL = import.meta.env.VITE_WHOP_BUY_URL as string | undefined
 // Each Whop license key maps to one Supabase account.
 // We synthesise an email so Supabase can manage the session.
 function keyToEmail(key: string) {
-  return `${key.toLowerCase().replace(/[^a-z0-9]/g, '')}@whop.tradinglab`
+  return `${key.toLowerCase().replace(/[^a-z0-9]/g, '')}@license.tradinglab.app`
 }
 
 async function validateWhopKey(key: string): Promise<{ valid: boolean; error?: string }> {
