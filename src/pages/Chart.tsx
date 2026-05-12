@@ -122,13 +122,14 @@ function TVChart({ symbol, interval }: { symbol: string; interval: string }) {
 
 // ── Main Chart Page ───────────────────────────────────────────────────────────
 export function Chart() {
-  const [symbol,   setSymbol]   = useState('NASDAQ:QQQ')
-  const [tf,       setTf]       = useState('15')
-  const [chartKey, setChartKey] = useState(0)
-  const [custom,   setCustom]   = useState('')
-  const [buildId,  setBuildId]  = useState('')
-  const [expanded, setExpanded] = useState<string | null>(null)
-  const { builds }              = useBuilds()
+  const [symbol,      setSymbol]      = useState('NASDAQ:QQQ')
+  const [tf,          setTf]          = useState('15')
+  const [chartKey,    setChartKey]    = useState(0)
+  const [custom,      setCustom]      = useState('')
+  const [buildId,     setBuildId]     = useState('')
+  const [expanded,    setExpanded]    = useState<string | null>(null)
+  const [guideOpen,   setGuideOpen]   = useState(false)
+  const { builds }                    = useBuilds()
 
   const activePreset = PRESETS.find(p => p.symbol === symbol)
   const activeBuild  = builds.find(b => b.id === buildId)
@@ -217,12 +218,19 @@ export function Chart() {
             ))}
           </div>
 
-          {/* Current symbol + reload */}
+          {/* Current symbol + reload + mobile guide toggle */}
           <div className="ml-auto flex items-center gap-2">
-            <span className="text-[11px] text-slate-600">
+            <span className="hidden sm:inline text-[11px] text-slate-600">
               {activePreset ? `${activePreset.label} — ${activePreset.desc}` : symbol}
               {' · '}{tf}m
             </span>
+            <button
+              onClick={() => setGuideOpen(o => !o)}
+              className={`md:hidden flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border transition-all
+                ${guideOpen ? 'border-amber-500/40 bg-amber-500/10 text-amber-300' : 'border-slate-800 text-slate-500 hover:text-slate-300'}`}
+            >
+              <Lightbulb size={11} /> Guide
+            </button>
             <button
               onClick={() => setChartKey(k => k + 1)}
               className="flex items-center gap-1.5 text-[11px] text-slate-600 hover:text-slate-300 px-2 py-1.5 rounded-lg hover:bg-slate-800/50 transition-all"
@@ -239,11 +247,19 @@ export function Chart() {
       </div>
 
       {/* ── Instructions panel ──────────────────────────────── */}
-      <div className="hidden md:flex w-[310px] flex-shrink-0 border-l border-slate-800/50 flex-col bg-[#06060d] overflow-hidden">
+      <div className={`${guideOpen ? 'flex' : 'hidden'} md:flex w-full md:w-[310px] flex-shrink-0 border-l border-slate-800/50 flex-col bg-[#06060d] overflow-hidden absolute md:relative inset-0 z-10 md:z-auto`}>
         <div className="px-4 py-3.5 border-b border-slate-800/50 space-y-3">
-          <div>
-            <p className="text-[14px] font-bold text-white">Drawing Guide</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">TradingView steps for each concept in your build</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[14px] font-bold text-white">Drawing Guide</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">TradingView steps for each concept in your build</p>
+            </div>
+            <button
+              onClick={() => setGuideOpen(false)}
+              className="md:hidden w-8 h-8 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-all"
+            >
+              <ChevronDown size={16} />
+            </button>
           </div>
           <select
             className="w-full bg-slate-900 border border-slate-700/60 rounded-xl px-3 py-2 text-[12px] text-slate-200 focus:outline-none focus:border-slate-500 transition-colors"
