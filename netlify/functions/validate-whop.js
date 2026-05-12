@@ -32,9 +32,8 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ valid: false, error: 'No license key provided' }) }
   }
 
-  // Test key — works with or without WHOP_API_KEY being set
-  const testKey = process.env.TEST_LICENSE_KEY || 'TRADINGLAB-TEST-2026'
-  if (key === testKey) {
+  // Hardcoded test key for staging — remove this block before going live
+  if (key === 'TRADINGLAB-TEST-2026') {
     return { statusCode: 200, headers, body: JSON.stringify({ valid: true, status: 'active' }) }
   }
 
