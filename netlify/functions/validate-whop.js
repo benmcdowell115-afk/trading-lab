@@ -32,6 +32,12 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ valid: false, error: 'No license key provided' }) }
   }
 
+  // Preview/test key — set TEST_LICENSE_KEY env var in Netlify to enable
+  const testKey = process.env.TEST_LICENSE_KEY
+  if (testKey && key === testKey) {
+    return { statusCode: 200, headers, body: JSON.stringify({ valid: true, status: 'active' }) }
+  }
+
   const apiKey = process.env.WHOP_API_KEY
   if (!apiKey) {
     return { statusCode: 200, headers, body: JSON.stringify({ valid: false, error: 'No license key found. Get access at our Whop page.' }) }
