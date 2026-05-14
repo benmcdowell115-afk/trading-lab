@@ -119,8 +119,8 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
       <header className="relative flex-shrink-0 bg-[#06060d] border-b border-slate-800/50">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
 
-        {/* Top row */}
-        <div className="flex items-center gap-3 md:gap-6 px-5 md:px-6 h-14 md:h-16">
+        {/* Top row — logo left, clock absolute-center, actions right */}
+        <div className="relative flex items-center px-5 md:px-6 h-14 md:h-16">
 
           {/* Logo */}
           <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0">
@@ -134,40 +134,40 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
             </div>
           </div>
 
-          {/* Kill zone clock — hidden on mobile */}
-          <div className="hidden md:flex flex-1 items-center justify-center">
+          {/* Kill zone clock — absolutely centered so it never pushes the right actions */}
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
             <KillZoneClock />
           </div>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 ml-auto md:ml-0">
+          {/* Right actions — ml-auto always pushes flush against right padding */}
+          <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 ml-auto">
             <button
               onClick={() => setQuizOpen(true)}
               className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-purple-500/40 hover:text-purple-400 hover:bg-purple-500/8 transition-all"
             >
               <Brain size={12} />
-              <span className="hidden sm:inline">Quiz</span>
+              <span className="hidden lg:inline">Quiz</span>
             </button>
             <button
               onClick={() => setRulesOpen(true)}
               className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all"
             >
               <Shield size={12} />
-              <span className="hidden sm:inline">Rules</span>
+              <span className="hidden lg:inline">Rules</span>
             </button>
             <button
               onClick={() => setNotesOpen(true)}
               className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-amber-500/40 hover:text-amber-400 hover:bg-amber-500/8 transition-all"
             >
               <StickyNote size={12} />
-              <span className="hidden sm:inline">Notes</span>
+              <span className="hidden lg:inline">Notes</span>
             </button>
             <button
               onClick={() => setSettingsOpen(true)}
               className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-slate-500 hover:text-slate-300 hover:bg-slate-800/40 transition-all"
             >
               <Settings size={12} />
-              <span className="hidden sm:inline">Settings</span>
+              <span className="hidden lg:inline">Settings</span>
             </button>
             {signOut && (
               <button
@@ -176,7 +176,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
                 className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all"
               >
                 <LogOut size={12} />
-                <span className="hidden sm:inline">Sign out</span>
+                <span className="hidden lg:inline">Sign out</span>
               </button>
             )}
           </div>
