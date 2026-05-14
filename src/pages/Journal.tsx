@@ -234,7 +234,8 @@ export function Journal() {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Header */}
-      <div className="flex items-center justify-between px-5 md:px-6 py-3 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0 gap-2 flex-wrap">
+      <div className="border-b border-slate-800/50 bg-[#06060d] flex-shrink-0">
+        <div className="max-w-5xl mx-auto px-5 md:px-6 py-3 flex items-center justify-between gap-2 flex-wrap">
         <div>
           <h2 className="text-[15px] font-bold text-white">Trade Journal</h2>
           <p className="text-[11px] text-slate-500 mt-0.5">{total} trade{total !== 1 ? 's' : ''} total</p>
@@ -286,6 +287,7 @@ export function Journal() {
             </button>
           )}
         </div>
+        </div>
       </div>
 
       {view === 'analytics' ? (
@@ -316,7 +318,7 @@ export function Journal() {
 
             {/* Entry list */}
             <div className="flex-1 overflow-y-auto">
-            <div className="max-w-5xl mx-auto px-5 md:px-6 py-5 space-y-3">
+            <div className="max-w-5xl mx-auto px-6 md:px-8 py-5 space-y-3">
               {filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-4">
                   <div className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-800 flex items-center justify-center text-2xl">📓</div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Save, Zap, X, Search, RotateCcw, Share2, Check, Layers, Droplets, Target, Clock, Compass, GitBranch, ClipboardList, Bookmark, Library, BarChart2 } from 'lucide-react'
+import { Save, Zap, X, RotateCcw, Share2, Check, Layers, Droplets, Target, Clock, Compass, GitBranch, ClipboardList, Bookmark, Library, BarChart2 } from 'lucide-react'
 import { concepts, getSynergiesFor, getConceptById } from '../data/concepts'
 import { ConceptCard } from '../components/ConceptCard'
 import { SynergyPanel } from '../components/SynergyPanel'
@@ -126,13 +126,12 @@ export function Builder({ initialBuild }: Props) {
           {/* Search + filters */}
           <div className="px-6 pb-5 pt-1 space-y-3 border-b border-slate-800/40 flex-shrink-0">
             <div className="relative">
-              <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
               <input
                 ref={searchRef}
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search concepts or tags..."
-                className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl pl-9 pr-9 py-2.5 text-[13px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-slate-600 focus:bg-slate-900 transition-all"
+                className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl pl-4 pr-9 py-2.5 text-[13px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-slate-600 focus:bg-slate-900 transition-all"
               />
               {search ? (
                 <button

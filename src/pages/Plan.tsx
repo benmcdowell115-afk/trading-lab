@@ -241,26 +241,28 @@ export function Plan() {
       <div className="flex-1 flex flex-col overflow-hidden min-w-0 border-r border-slate-800/50">
 
         {/* Sub-nav */}
-        <div className="flex items-center border-b border-slate-800/50 bg-[#06060d]">
-          {([
-            ['plan',    'Session Plan',  CalendarDays ],
-            ['calc',    'Risk Calc',     Calculator   ],
-            ['history', 'Past Plans',   BookOpen     ],
-          ] as const).map(([id, label, Icon]) => (
-            <button
-              key={id}
-              onClick={() => setView(id as any)}
-              className={`flex items-center gap-2 px-5 py-3 text-[12px] font-semibold border-b-2 transition-all
-                ${view === id ? 'border-amber-400 text-slate-100' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
-            >
-              <Icon size={13} />
-              {label}
-            </button>
-          ))}
+        <div className="border-b border-slate-800/50 bg-[#06060d]">
+          <div className="max-w-3xl mx-auto px-5 md:px-8 flex items-center">
+            {([
+              ['plan',    'Session Plan', CalendarDays ],
+              ['calc',    'Risk Calc',    Calculator   ],
+              ['history', 'Past Plans',  BookOpen     ],
+            ] as const).map(([id, label, Icon]) => (
+              <button
+                key={id}
+                onClick={() => setView(id as any)}
+                className={`flex items-center gap-2 px-4 py-3 text-[12px] font-semibold border-b-2 transition-all
+                  ${view === id ? 'border-amber-400 text-slate-100' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+              >
+                <Icon size={13} />
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto px-5 md:px-8 py-6">
+          <div className="max-w-3xl mx-auto px-6 md:px-8 py-6">
 
           {/* SESSION PLAN */}
           {view === 'plan' && (

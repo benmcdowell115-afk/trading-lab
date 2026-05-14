@@ -117,7 +117,7 @@ export function Templates({ onLoad }: Props) {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-6xl mx-auto px-5 md:px-8 py-8 space-y-10">
+      <div className="max-w-6xl mx-auto px-6 md:px-8 py-8 space-y-10">
         {/* Page header */}
         <div>
           <h1 className="text-[22px] font-bold text-white tracking-tight">Build Templates</h1>
