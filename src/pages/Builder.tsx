@@ -234,7 +234,7 @@ export function Builder({ initialBuild }: Props) {
           </AnimatePresence>
 
           {/* Concept list */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5">
             <AnimatePresence mode="popLayout">
               {filtered.map(concept => (
                 <ConceptCard

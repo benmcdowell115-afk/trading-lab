@@ -106,7 +106,8 @@ export function JournalAnalytics({ entries }: Props) {
   )
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5">
+    <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6 md:py-8 space-y-5">
+      <div className="max-w-5xl mx-auto w-full space-y-5">
 
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -116,7 +117,7 @@ export function JournalAnalytics({ entries }: Props) {
           { label: 'Avg R:R', value: rr, sub: `${avgWinPts.toFixed(0)}pt win / ${avgLossPts.toFixed(0)}pt loss`, color: 'text-blue-400', mono: true },
           { label: 'Streak', value: streak.type ? `${streak.count}${streak.type}` : '—', sub: streak.type === 'W' ? 'current win streak' : streak.type === 'L' ? 'current loss streak' : 'no streak', color: streak.type === 'W' ? 'text-emerald-400' : streak.type === 'L' ? 'text-red-400' : 'text-slate-400' },
         ].map(s => (
-          <div key={s.label} className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl px-4 py-3.5">
+          <div key={s.label} className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl px-5 py-4">
             <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">{s.label}</p>
             <p className={`text-[22px] font-bold mt-1 leading-none ${s.color}`} style={{ fontFamily: s.mono ? "'JetBrains Mono', monospace" : undefined }}>{s.value}</p>
             <p className="text-[10px] text-slate-600 mt-1">{s.sub}</p>
@@ -241,6 +242,7 @@ export function JournalAnalytics({ entries }: Props) {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

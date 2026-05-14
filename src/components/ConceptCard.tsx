@@ -98,7 +98,7 @@ export function ConceptCard({ concept, selected, onToggle }: Props) {
         ${selected ? 'opacity-100 shadow-lg ' + cfg.dotGlow : 'opacity-35 group-hover:opacity-65'} transition-opacity duration-200`}
       />
 
-      <div className="relative pl-5 pr-4 pt-4 pb-3.5">
+      <div className="relative pl-5 pr-5 pt-4 pb-4">
         {/* Meta row */}
         <div className="flex items-center gap-2 mb-2.5">
           <div className={`w-2 h-2 rounded-full flex-shrink-0 ${cfg.dot} ${selected ? 'shadow-sm ' + cfg.dotGlow : ''}`} />
@@ -153,7 +153,7 @@ export function ConceptCard({ concept, selected, onToggle }: Props) {
         </div>
 
         {/* Bottom row: expand + bookmark + notes */}
-        <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-800/40">
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/40">
           <button
             onClick={e => { e.stopPropagation(); setExpanded(x => !x) }}
             className="flex items-center gap-1.5 text-[11.5px] font-medium text-slate-500 hover:text-amber-400 transition-colors"

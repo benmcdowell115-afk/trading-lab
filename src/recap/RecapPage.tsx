@@ -220,7 +220,7 @@ export function RecapPage() {
 
       {/* Sub-nav: view switcher + export */}
       {step === 'preview' && (
-        <div className="flex items-center justify-between px-5 py-2 flex-shrink-0 bg-[#06060d] border-b border-slate-800/50">
+        <div className="flex items-center justify-between px-5 py-3 flex-shrink-0 bg-[#06060d] border-b border-slate-800/50">
           <div className="flex items-center gap-2">
             <button onClick={reset}
               className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border border-slate-800 text-slate-500 hover:text-slate-300 hover:border-slate-600 transition-all">

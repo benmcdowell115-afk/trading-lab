@@ -76,7 +76,7 @@ function KeyLevelsPanel() {
   const currentLevels = levels[inst] ?? []
 
   return (
-    <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4 space-y-3.5">
+    <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-5 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Target size={13} className="text-amber-400" />
@@ -192,7 +192,7 @@ export function Home({ onNavigate }: { onNavigate?: (tab: string) => void }) {
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#05050a]">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-5 space-y-4">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-5">
 
         {/* ── Greeting ── */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -208,10 +208,10 @@ export function Home({ onNavigate }: { onNavigate?: (tab: string) => void }) {
         </div>
 
         {/* ── Top grid: Kill Zone + Events ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
           {/* Kill Zone card */}
-          <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4 space-y-3.5">
+          <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-5 space-y-4">
             <div className="flex items-center gap-2">
               <Radio size={13} className="text-slate-400" />
               <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">Kill Zones</span>
@@ -253,7 +253,7 @@ export function Home({ onNavigate }: { onNavigate?: (tab: string) => void }) {
           </div>
 
           {/* This week's events */}
-          <div className="md:col-span-2 bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4">
+          <div className="md:col-span-2 bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-3">
               <Zap size={13} className="text-red-400" />
               <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">Upcoming Red Events</span>
@@ -286,10 +286,10 @@ export function Home({ onNavigate }: { onNavigate?: (tab: string) => void }) {
         </div>
 
         {/* ── Middle grid: Recent Performance + Key Levels ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
           {/* Recent P&L */}
-          <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4 space-y-3.5">
+          <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <BarChart2 size={13} className="text-blue-400" />
@@ -356,10 +356,10 @@ export function Home({ onNavigate }: { onNavigate?: (tab: string) => void }) {
         </div>
 
         {/* ── Bottom grid: Mastery + Build ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
           {/* Mastery progress */}
-          <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4 space-y-3.5">
+          <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TrendingUp size={13} className="text-purple-400" />
@@ -402,7 +402,7 @@ export function Home({ onNavigate }: { onNavigate?: (tab: string) => void }) {
           </div>
 
           {/* Latest build */}
-          <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4 space-y-3.5">
+          <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Package size={13} className="text-amber-400" />
@@ -460,7 +460,7 @@ export function Home({ onNavigate }: { onNavigate?: (tab: string) => void }) {
         </div>
 
         {/* Account snapshot */}
-        <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl px-5 py-3.5 flex items-center justify-between flex-wrap gap-3">
+        <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl px-5 py-4 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-5 flex-wrap">
             <div>
               <p className="text-[9px] text-slate-600 uppercase tracking-wider font-semibold">Account Size</p>
