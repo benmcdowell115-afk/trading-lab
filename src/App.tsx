@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import {
   FlaskConical, Package, Beaker, Network,
   LayoutTemplate, BookOpen, LineChart, StickyNote,
   Shield, ClipboardCheck, Brain, CalendarDays, Settings, LogOut, BarChart2,
 } from 'lucide-react'
+import { Landing } from './pages/Landing'
 import { Builder }        from './pages/Builder'
 import { MyBuilds }       from './pages/MyBuilds'
 import { ConceptMap }     from './pages/ConceptMap'
@@ -44,7 +45,13 @@ const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
 
 export default function App() {
   const { user, loading: authLoading, signOut } = useAuth()
-  const [synced, setSynced] = useState(false)
+  const [synced,      setSynced]      = useState(false)
+  const [enteredApp,  setEnteredApp]  = useState(false)
+
+  // Detect mobile once on mount — no SSR so window is always available
+  const isMobile = useMemo(() =>
+    /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768
+  , [])
 
   // After login, sync Supabase → localStorage, then render the app
   useEffect(() => {
@@ -66,6 +73,12 @@ export default function App() {
 
   // Show login if Supabase is configured but user is not authenticated
   if (SUPABASE_CONFIGURED && !user) return <LoginScreen />
+
+  // Mobile: landing page only — full app is desktop + native app
+  if (isMobile) return <Landing />
+
+  // Desktop: landing first, then full app on "Launch"
+  if (!enteredApp) return <Landing onLaunch={() => setEnteredApp(true)} />
 
   return <AppShell signOut={SUPABASE_CONFIGURED ? signOut : undefined} userEmail={user?.email} />
 }
