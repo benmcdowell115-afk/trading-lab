@@ -12,7 +12,7 @@ function keyToEmail(key: string) {
 
 async function validateWhopKey(key: string): Promise<{ valid: boolean; error?: string }> {
   try {
-    const res = await fetch('/.netlify/functions/validate-whop', {
+    const res = await fetch('https://hgvktmjqegywjrwbkipv.supabase.co/functions/v1/validate-whop', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key }),
