@@ -158,7 +158,7 @@ export function Slideshow({ trades, theme, label, onClose }: Props) {
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', gap: 20,
         padding: '60px 24px 60px',
-        maxWidth: '100vw', maxHeight: '100vh',
+        width: '100%', maxWidth: '100vw', maxHeight: '100vh',
         overflowY: 'auto',
         pointerEvents: 'none',
       }}>
@@ -199,7 +199,7 @@ export function Slideshow({ trades, theme, label, onClose }: Props) {
 
         {/* ── CARD ── */}
         {phase === 'card' && trade && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, position: 'relative', width: '100%' }}>
             {/* Glow behind card */}
             <div style={{
               position: 'absolute',

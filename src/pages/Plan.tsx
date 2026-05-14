@@ -260,7 +260,7 @@ export function Plan() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto px-5 md:px-6 py-5">
+          <div className="max-w-3xl mx-auto px-5 md:px-8 py-6">
 
           {/* SESSION PLAN */}
           {view === 'plan' && (

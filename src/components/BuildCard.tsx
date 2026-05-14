@@ -19,7 +19,7 @@ export function BuildCard({ build, onDelete, onShare, onLoad }: Props) {
 
   return (
     <>
-      <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4 space-y-3.5 hover:border-slate-700/60 transition-all">
+      <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-5 space-y-4 hover:border-slate-700/60 transition-all">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1.5">

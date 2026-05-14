@@ -110,14 +110,14 @@ export function Templates({ onLoad }: Props) {
   }
 
   const sections: { difficulty: Template['difficulty']; cols: string }[] = [
-    { difficulty: 'basic',        cols: 'grid-cols-3' },
-    { difficulty: 'intermediate', cols: 'grid-cols-2' },
-    { difficulty: 'advanced',     cols: 'grid-cols-2' },
+    { difficulty: 'basic',        cols: 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' },
+    { difficulty: 'intermediate', cols: 'grid-cols-1 md:grid-cols-2' },
+    { difficulty: 'advanced',     cols: 'grid-cols-1 md:grid-cols-2' },
   ]
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-6xl mx-auto px-6 py-8 space-y-10">
+      <div className="max-w-6xl mx-auto px-5 md:px-8 py-8 space-y-10">
         {/* Page header */}
         <div>
           <h1 className="text-[22px] font-bold text-white tracking-tight">Build Templates</h1>

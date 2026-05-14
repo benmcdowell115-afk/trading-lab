@@ -110,7 +110,7 @@ export function Calendar() {
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#05050a]">
-      <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+      <div className="max-w-5xl mx-auto px-5 md:px-8 py-8 space-y-8">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-6">

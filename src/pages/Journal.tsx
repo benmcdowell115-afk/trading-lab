@@ -234,7 +234,7 @@ export function Journal() {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-5 py-2.5 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0 gap-2 flex-wrap">
+      <div className="flex items-center justify-between px-5 md:px-6 py-3 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0 gap-2 flex-wrap">
         <div>
           <h2 className="text-[15px] font-bold text-white">Trade Journal</h2>
           <p className="text-[11px] text-slate-500 mt-0.5">{total} trade{total !== 1 ? 's' : ''} total</p>

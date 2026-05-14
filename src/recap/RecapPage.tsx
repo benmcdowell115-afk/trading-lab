@@ -386,7 +386,7 @@ export function RecapPage() {
 
               {/* Video */}
               {view === 'video' && (
-                <div className="flex flex-col items-center gap-4 w-full max-w-md mx-auto">
+                <div className="flex flex-col items-center gap-4 w-full max-w-sm mx-auto">
                   <div className="rounded-2xl px-8 py-6 w-full text-center"
                     style={{ background: theme.surface, border: `1px solid ${theme.divider}` }}>
                     <div className="text-3xl mb-3">▶</div>
