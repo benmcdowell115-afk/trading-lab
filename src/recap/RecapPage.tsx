@@ -50,27 +50,59 @@ export function RecapPage() {
   const theme = THEMES[themeKey]
 
   /* ── CSV processing ─────────────────────────────────────── */
-  const processFile = useCallback(async (file: File) => {
-    const { headers, rows } = await parseCSV(file)
-    const detected = detectColumns(headers)
-    setHeaders(headers); setRows(rows); setColumnMap(detected)
-    if (!detected.symbol && !detected.pnl) {
-      setStep('mapping')
-    } else {
-      setEntries(buildTrades(rows, detected).map(t => ({ trade: t, disabled: false, note: '', selected: false })))
+  const [filesLoaded, setFilesLoaded] = useState(0)
+
+  const processFiles = useCallback(async (files: FileList | File[]) => {
+    const csvFiles = Array.from(files).filter(f => f.name.endsWith('.csv'))
+    if (!csvFiles.length) return
+
+    // Single file: use existing mapping flow if detection fails
+    if (csvFiles.length === 1) {
+      const { headers: h, rows: r } = await parseCSV(csvFiles[0])
+      const detected = detectColumns(h)
+      setHeaders(h); setRows(r); setColumnMap(detected)
+      setFilesLoaded(1)
+      if (!detected.symbol && !detected.pnl) {
+        setStep('mapping')
+      } else {
+        setEntries(buildTrades(r, detected).map(t => ({ trade: t, disabled: false, note: '', selected: false })))
+        setStep('preview')
+      }
+      return
+    }
+
+    // Multiple files: parse all, merge all auto-detected trades
+    const allEntries: TradeEntry[] = []
+    let fileIdx = 0
+    for (const file of csvFiles) {
+      const { headers: h, rows: r } = await parseCSV(file)
+      const detected = detectColumns(h)
+      if (!detected.symbol && !detected.pnl) continue // skip unmappable files
+      const trades = buildTrades(r, detected).map((t, i) => ({
+        trade: { ...t, id: `f${fileIdx}-${i}-${t.id}` },
+        disabled: false,
+        note: '',
+        selected: false,
+      }))
+      allEntries.push(...trades)
+      fileIdx++
+    }
+    if (allEntries.length) {
+      setFilesLoaded(fileIdx)
+      setEntries(allEntries)
       setStep('preview')
     }
   }, [])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault(); setIsDragging(false)
-    const f = e.dataTransfer.files[0]
-    if (f?.name.endsWith('.csv')) processFile(f)
-  }, [processFile])
+    if (e.dataTransfer.files.length) processFiles(e.dataTransfer.files)
+  }, [processFiles])
 
   const handleFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0]; if (f) processFile(f); e.target.value = ''
-  }, [processFile])
+    if (e.target.files?.length) processFiles(e.target.files)
+    e.target.value = ''
+  }, [processFiles])
 
   const confirmMapping = useCallback(() => {
     setEntries(buildTrades(rows, columnMap).map(t => ({ trade: t, disabled: false, note: '', selected: false })))
@@ -170,7 +202,7 @@ export function RecapPage() {
     setStep('upload'); setEntries([]); setHeaders([]); setRows([])
     setColumnMap({}); setSelectMode(false); setFilterMode('all')
     setSortBy('default'); setSymbolSearch(''); setShowStats(false)
-    cardRefs.current = []
+    setFilesLoaded(0); cardRefs.current = []
   }, [])
 
   const selectedCount = entries.filter(e => e.selected).length
@@ -194,6 +226,12 @@ export function RecapPage() {
               className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border border-slate-800 text-slate-500 hover:text-slate-300 hover:border-slate-600 transition-all">
               ← New Import
             </button>
+            {filesLoaded > 1 && (
+              <span className="text-[10px] font-mono px-2 py-1 rounded-md"
+                style={{ background: `${theme.accent}15`, border: `1px solid ${theme.accent}30`, color: theme.accentText }}>
+                {filesLoaded} files merged
+              </span>
+            )}
             <div className="flex bg-slate-900/60 border border-slate-800 rounded-xl p-0.5 gap-0.5">
               {(['cards', 'montage', 'video'] as View[]).map(v => (
                 <button key={v} onClick={() => setView(v)}
@@ -236,7 +274,7 @@ export function RecapPage() {
 
           {/* ── UPLOAD ── */}
           {step === 'upload' && (
-            <div className="flex flex-col items-center gap-6 w-full max-w-xl animate-recap-fade-up">
+            <div className="flex flex-col items-center gap-6 w-full max-w-xl mx-auto animate-recap-fade-up">
               <div className="text-center">
                 <h2 className="font-black mb-2"
                   style={{ fontSize: 40, letterSpacing: '-2px', lineHeight: 1, color: theme.textPrimary }}>
@@ -262,7 +300,7 @@ export function RecapPage() {
                 <div className="text-3xl" style={{ transform: isDragging ? 'scale(1.1) rotate(-4deg)' : 'scale(1)', transition: 'transform 0.2s' }}>📂</div>
                 <div className="text-center">
                   <p className="font-semibold text-sm mb-1" style={{ color: theme.textSecondary }}>
-                    {isDragging ? 'Drop it in' : 'Drop your CSV here'}
+                    {isDragging ? 'Drop it in' : 'Drop one or more CSVs here'}
                   </p>
                   <p className="text-xs" style={{ color: theme.textMuted }}>
                     Apex · FTMO · TopStep · TradeStation · Webull & more
@@ -273,7 +311,7 @@ export function RecapPage() {
                   or click to browse
                 </div>
               </div>
-              <input id="recap-file-input" type="file" accept=".csv" className="hidden" onChange={handleFile} />
+              <input id="recap-file-input" type="file" accept=".csv" multiple className="hidden" onChange={handleFile} />
 
               <div className="flex flex-wrap justify-center gap-1.5">
                 {['Apex Trader', 'FTMO', 'TopStep', 'TradeStation', 'TD Ameritrade', 'Webull', 'Tradovate', '+ more'].map(b => (

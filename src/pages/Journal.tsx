@@ -296,7 +296,8 @@ export function Journal() {
           <div className="flex flex-col flex-1 overflow-hidden min-w-0">
 
             {/* Stats bar */}
-            <div className="grid grid-cols-2 md:grid-cols-4 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0">
+            <div className="border-b border-slate-800/50 bg-[#06060d] flex-shrink-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 max-w-5xl mx-auto w-full">
               {[
                 { label: 'Showing',  value: filteredTotal, color: 'text-slate-200' },
                 { label: 'Win Rate', value: `${filteredRate}%`, color: filteredRate >= 60 ? 'text-emerald-400' : filteredRate >= 40 ? 'text-amber-400' : 'text-red-400' },
@@ -310,6 +311,7 @@ export function Journal() {
                   </p>
                 </div>
               ))}
+            </div>
             </div>
 
             {/* Entry list */}
