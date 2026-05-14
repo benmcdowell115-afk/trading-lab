@@ -259,17 +259,18 @@ export function Plan() {
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 md:p-6">
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-3xl mx-auto px-5 md:px-6 py-5">
 
           {/* SESSION PLAN */}
           {view === 'plan' && (
-            <div className="max-w-2xl space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-[16px] font-bold text-white">Today's Session Plan</h2>
-                <div className="flex items-center gap-2">
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <h2 className="text-[15px] font-bold text-white">Today's Session Plan</h2>
+                <div className="flex items-center gap-2 flex-wrap">
                   <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-[12px] text-slate-300 focus:outline-none focus:border-slate-500" />
-                  <div className="flex gap-1.5">
+                    className="bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-1.5 text-[12px] text-slate-200 focus:outline-none focus:border-slate-600 transition-all" />
+                  <div className="flex gap-1.5 flex-wrap">
                     {(['NQ', 'ES', 'GC', 'SI'] as Instrument[]).map(i => (
                       <button key={i} onClick={() => setInstrument(i)}
                         className={`px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition-all
@@ -430,7 +431,7 @@ export function Plan() {
 
           {/* CALCULATOR */}
           {view === 'calc' && (
-            <div className="max-w-md">
+            <div className="max-w-md mx-auto">
               <h2 className="text-[16px] font-bold text-white mb-5">Position Size Calculator</h2>
               <RiskCalc defaultInstrument={instrument} />
             </div>
@@ -438,7 +439,7 @@ export function Plan() {
 
           {/* PAST PLANS */}
           {view === 'history' && (
-            <div className="max-w-2xl space-y-3">
+            <div className="space-y-3">
               <h2 className="text-[16px] font-bold text-white">Past Plans</h2>
               {plans.length === 0 ? (
                 <p className="text-[12px] text-slate-600 py-8 text-center">No saved plans yet. Fill out today\'s session plan and save it.</p>
@@ -477,6 +478,7 @@ export function Plan() {
               )}
             </div>
           )}
+        </div>
         </div>
       </div>
 

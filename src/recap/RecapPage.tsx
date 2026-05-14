@@ -188,39 +188,27 @@ export function RecapPage() {
 
       {/* Sub-nav: view switcher + export */}
       {step === 'preview' && (
-        <div className="flex items-center justify-between px-6 py-2.5 flex-shrink-0"
-          style={{ borderBottom: `1px solid ${theme.divider}`, background: 'rgba(0,0,0,0.3)' }}>
+        <div className="flex items-center justify-between px-5 py-2 flex-shrink-0 bg-[#06060d] border-b border-slate-800/50">
           <div className="flex items-center gap-2">
             <button onClick={reset}
-              className="text-xs px-2.5 py-1.5 rounded-lg transition-colors"
-              style={{ color: theme.textMuted, background: 'transparent', border: 'none', cursor: 'pointer' }}>
+              className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border border-slate-800 text-slate-500 hover:text-slate-300 hover:border-slate-600 transition-all">
               ← New Import
             </button>
-            <div className="flex items-center gap-0.5 p-0.5 rounded-xl"
-              style={{ background: theme.surface, border: `1px solid ${theme.divider}` }}>
+            <div className="flex bg-slate-900/60 border border-slate-800 rounded-xl p-0.5 gap-0.5">
               {(['cards', 'montage', 'video'] as View[]).map(v => (
                 <button key={v} onClick={() => setView(v)}
-                  className="px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-all"
-                  style={{
-                    background: view === v ? `${theme.accent}28` : 'transparent',
-                    color: view === v ? theme.accentText : theme.textMuted,
-                    border: view === v ? `1px solid ${theme.accent}45` : '1px solid transparent',
-                    cursor: 'pointer',
-                  }}>
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all
+                    ${view === v ? 'bg-slate-700 text-slate-100' : 'text-slate-500 hover:text-slate-300'}`}>
                   {v === 'cards' ? '⊞ Cards' : v === 'montage' ? '⊟ Montage' : '▶ Video'}
                 </button>
               ))}
             </div>
           </div>
           <button onClick={handleExport} disabled={isExporting}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border-none transition-all"
-            style={{
-              background: isExporting ? theme.surface : theme.accent,
-              color: isExporting ? theme.textMuted : theme.bgBase,
-              boxShadow: isExporting ? 'none' : `0 0 14px ${theme.accent}50`,
-              cursor: isExporting ? 'not-allowed' : 'pointer',
-              minWidth: 100,
-            }}>
+            className={`flex items-center gap-1.5 text-[12px] font-semibold px-3.5 py-2 rounded-xl border transition-all
+              ${isExporting
+                ? 'border-slate-800 text-slate-600 cursor-not-allowed'
+                : 'bg-amber-500/15 border-amber-500/35 text-amber-300 hover:bg-amber-500/25 cursor-pointer'}`}>
             {isExporting
               ? `◌ ${Math.round(exportProgress * 100)}%`
               : view === 'montage' ? '↓ PNG' : view === 'video' ? '▶ Play' : '↓ Cards'}
@@ -266,7 +254,7 @@ export function RecapPage() {
                 onClick={() => document.getElementById('recap-file-input')?.click()}
                 className="w-full rounded-2xl flex flex-col items-center justify-center gap-4 cursor-pointer transition-all duration-300"
                 style={{
-                  height: 220,
+                  minHeight: 180,
                   border: `2px dashed ${isDragging ? theme.accent + 'cc' : theme.divider}`,
                   background: isDragging ? `${theme.accent}08` : theme.surface2,
                   boxShadow: isDragging ? `0 0 40px ${theme.accent}18` : 'none',
@@ -312,8 +300,8 @@ export function RecapPage() {
                 <div className="flex justify-center">
                   <input type="text" placeholder="Label — e.g. 'May 2025'" value={montageLabel}
                     onChange={e => setMontageLabel(e.target.value)}
-                    className="px-4 py-2 rounded-xl text-sm font-mono outline-none text-center"
-                    style={{ background: theme.surface, border: `1px solid ${montageLabel ? theme.accent + '50' : theme.divider}`, color: theme.textSecondary, width: 280 }} />
+                    className="w-full max-w-xs px-4 py-2 rounded-xl text-sm font-mono outline-none text-center"
+                    style={{ background: theme.surface, border: `1px solid ${montageLabel ? theme.accent + '50' : theme.divider}`, color: theme.textSecondary }} />
                 </div>
               )}
 
