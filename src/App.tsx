@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   FlaskConical, Package, Beaker, Network,
   LayoutTemplate, BookOpen, LineChart, StickyNote,
@@ -43,17 +43,19 @@ const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'recap',     label: 'Recap',     Icon: BarChart2      },
 ]
 
+// Mobile check runs synchronously before any hooks — no spinner, no auth race
+const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768
+
 export default function App() {
+  if (IS_MOBILE) return <Landing />
+  return <DesktopApp />
+}
+
+function DesktopApp() {
   const { user, loading: authLoading, signOut } = useAuth()
-  const [synced,      setSynced]      = useState(false)
-  const [enteredApp,  setEnteredApp]  = useState(false)
+  const [synced,     setSynced]     = useState(false)
+  const [enteredApp, setEnteredApp] = useState(false)
 
-  // Detect mobile once on mount — no SSR so window is always available
-  const isMobile = useMemo(() =>
-    /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768
-  , [])
-
-  // After login, sync Supabase → localStorage, then render the app
   useEffect(() => {
     if (!SUPABASE_CONFIGURED) { setSynced(true); return }
     if (authLoading) return
@@ -61,7 +63,6 @@ export default function App() {
     syncOnLogin(user.id).finally(() => setSynced(true))
   }, [user, authLoading])
 
-  // Show loading spinner while auth resolves
   if (authLoading || !synced) {
     return (
       <div className="flex items-center justify-center h-screen bg-[#05050a] gap-3">
@@ -71,13 +72,7 @@ export default function App() {
     )
   }
 
-  // Mobile: landing page only — no auth wall on mobile, just the landing
-  if (isMobile) return <Landing />
-
-  // Show login if Supabase is configured but user is not authenticated
   if (SUPABASE_CONFIGURED && !user) return <LoginScreen />
-
-  // Desktop: landing first, then full app on "Launch"
   if (!enteredApp) return <Landing onLaunch={() => setEnteredApp(true)} />
 
   return <AppShell signOut={SUPABASE_CONFIGURED ? signOut : undefined} userEmail={user?.email} />
