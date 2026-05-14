@@ -316,7 +316,7 @@ export function Journal() {
 
             {/* Entry list */}
             <div className="flex-1 overflow-y-auto">
-            <div className="max-w-5xl mx-auto px-4 md:px-5 py-4 space-y-3">
+            <div className="max-w-5xl mx-auto px-5 md:px-6 py-5 space-y-3">
               {filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-4">
                   <div className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-800 flex items-center justify-center text-2xl">📓</div>
@@ -339,7 +339,7 @@ export function Journal() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.97 }}
-                        className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4 hover:border-slate-700/50 transition-all group"
+                        className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-5 hover:border-slate-700/50 transition-all group"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-start gap-3 flex-1 min-w-0">

@@ -254,7 +254,7 @@ export function ConceptMap() {
       {/* ── Right panel ── */}
       <div className="w-[300px] flex-shrink-0 border-l border-slate-800/50 flex flex-col bg-[#06060d]">
 
-        <div className="px-4 py-3.5 border-b border-slate-800/50 space-y-3">
+        <div className="px-5 py-4 border-b border-slate-800/50 space-y-3">
           <div>
             <p className="text-[13px] font-bold text-white">Concept Map</p>
             <p className="text-[11px] text-slate-500 mt-0.5">{concepts.length} concepts · hover to explore</p>
@@ -306,7 +306,7 @@ export function ConceptMap() {
         </div>
 
         {/* Concept detail */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-5">
           {activeConcept ? (
             <div className="space-y-4">
               <div>

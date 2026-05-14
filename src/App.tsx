@@ -120,7 +120,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
 
         {/* Top row */}
-        <div className="flex items-center gap-3 md:gap-6 px-4 md:px-5 h-14 md:h-16">
+        <div className="flex items-center gap-3 md:gap-6 px-5 md:px-6 h-14 md:h-16">
 
           {/* Logo */}
           <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0">

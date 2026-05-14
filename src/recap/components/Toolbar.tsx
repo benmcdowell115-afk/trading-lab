@@ -53,8 +53,8 @@ export function Toolbar({
   totalTrades, visibleCount,
 }: Props) {
   return (
-    <div className="w-full flex items-center gap-3 px-4 md:px-6 py-2 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-      style={{ background: 'rgba(0,0,0,0.35)', borderBottom: `1px solid ${theme.divider}`, minHeight: 44 }}>
+    <div className="w-full flex items-center gap-3 px-5 md:px-6 py-2.5 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+      style={{ background: 'rgba(0,0,0,0.35)', borderBottom: `1px solid ${theme.divider}`, minHeight: 48 }}>
 
       {/* Theme — dot grid */}
       <div className="flex items-center gap-2">

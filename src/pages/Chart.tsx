@@ -157,7 +157,7 @@ export function Chart() {
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
         {/* Toolbar */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0 flex-wrap">
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0 flex-wrap">
 
           {/* Preset symbols */}
           <div className="flex gap-1.5 flex-wrap">
@@ -244,7 +244,7 @@ export function Chart() {
 
       {/* ── Instructions panel ──────────────────────────────── */}
       <div className={`${guideOpen ? 'flex' : 'hidden'} md:flex w-full md:w-[310px] flex-shrink-0 border-l border-slate-800/50 flex-col bg-[#06060d] overflow-hidden absolute md:relative inset-0 z-10 md:z-auto`}>
-        <div className="px-4 py-3.5 border-b border-slate-800/50 space-y-3">
+        <div className="px-5 py-4 border-b border-slate-800/50 space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[14px] font-bold text-white">Drawing Guide</p>
@@ -294,7 +294,7 @@ export function Chart() {
                 </button>
 
                 {isOpen && (
-                  <div className="px-4 pb-4 bg-slate-900/20 border-t border-slate-800/30 space-y-3.5 pt-3">
+                  <div className="px-5 pb-5 bg-slate-900/20 border-t border-slate-800/30 space-y-4 pt-4">
                     {instr ? (
                       <>
                         <div>
