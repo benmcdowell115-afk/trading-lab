@@ -68,7 +68,7 @@ export function TradingRules({ open, onClose }: Props) {
             </div>
 
             {/* Category filter */}
-            <div className="flex gap-1.5 px-4 py-3 border-b border-slate-800/40 flex-wrap">
+            <div className="flex gap-1.5 px-5 py-4 border-b border-slate-800/40 flex-wrap">
               {(['all', ...cats] as const).map(cat => (
                 <button
                   key={cat}
@@ -87,7 +87,7 @@ export function TradingRules({ open, onClose }: Props) {
             </div>
 
             {/* Rules list */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
               <AnimatePresence mode="popLayout">
                 {displayed.map(rule => (
                   <motion.div
@@ -143,7 +143,7 @@ export function TradingRules({ open, onClose }: Props) {
             </div>
 
             {/* Add rule */}
-            <div className="px-4 py-4 border-t border-slate-800/60 space-y-2.5">
+            <div className="px-5 py-5 border-t border-slate-800/60 space-y-2.5">
               <div className="flex gap-1.5">
                 {cats.map(cat => (
                   <button

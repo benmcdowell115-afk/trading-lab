@@ -185,7 +185,7 @@ export function SettingsModal({ open, onClose }: Props) {
               </div>
 
               {/* Point values reference */}
-              <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl p-3">
+              <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl p-4">
                 <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-2">Point Values (reference)</p>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                   {INSTRUMENTS.map(i => (

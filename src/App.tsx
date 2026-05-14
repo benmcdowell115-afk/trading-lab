@@ -183,7 +183,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
         </div>
 
         {/* Mobile kill zone clock */}
-        <div className="md:hidden px-4 pb-2.5">
+        <div className="md:hidden px-5 pb-3">
           <KillZoneClock />
         </div>
 

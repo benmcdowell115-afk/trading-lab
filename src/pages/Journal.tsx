@@ -304,7 +304,7 @@ export function Journal() {
                 { label: 'W/L/BE',   value: `${filteredWins}/${filteredLoss}/${filteredBE}`, color: 'text-slate-300', mono: true },
                 { label: 'Pts',      value: filteredPts >= 0 ? `+${filteredPts}` : `${filteredPts}`, color: filteredPts >= 0 ? 'text-emerald-400' : 'text-red-400', mono: true },
               ].map(s => (
-                <div key={s.label} className="px-3 md:px-4 py-3 border-r border-slate-800/40 last:border-r-0">
+                <div key={s.label} className="px-4 md:px-5 py-3 border-r border-slate-800/40 last:border-r-0">
                   <p className="text-[10px] text-slate-600 uppercase tracking-wider font-semibold">{s.label}</p>
                   <p className={`text-[14px] font-bold mt-0.5 ${s.color}`} style={{ fontFamily: s.mono ? "'JetBrains Mono', monospace" : undefined }}>
                     {s.value}
@@ -403,14 +403,14 @@ export function Journal() {
 
           {/* Quick stats sidebar — desktop only */}
           <div className="hidden md:flex w-[240px] flex-shrink-0 border-l border-slate-800/50 bg-[#06060d] flex-col overflow-hidden">
-            <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-slate-800/50">
+            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800/50">
               <BarChart2 size={12} className="text-blue-400" />
               <span className="text-[12px] font-semibold text-slate-200">Quick Stats</span>
             </div>
-            <div className="flex-1 p-4 space-y-5">
+            <div className="flex-1 p-5 space-y-5">
               {total > 0 && (
                 <>
-                  <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-4 text-center">
+                  <div className="bg-[#0b0b12] border border-slate-800/60 rounded-2xl p-5 text-center">
                     <div className="relative w-16 h-16 mx-auto mb-2.5">
                       <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
                         <circle cx="40" cy="40" r="32" fill="none" stroke="#1e2030" strokeWidth="8" />

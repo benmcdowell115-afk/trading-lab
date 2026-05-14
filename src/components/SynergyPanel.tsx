@@ -21,7 +21,7 @@ export function SynergyPanel({ selectedIds }: Props) {
 
   if (selectedIds.length < 2) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 text-center gap-3 px-4">
+      <div className="flex flex-col items-center justify-center h-48 text-center gap-3 px-5">
         <div className="w-10 h-10 rounded-2xl bg-slate-800/50 border border-slate-700/40 flex items-center justify-center">
           <Zap size={18} className="text-slate-500" />
         </div>
@@ -36,7 +36,7 @@ export function SynergyPanel({ selectedIds }: Props) {
 
   if (synergies.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 text-center gap-3 px-4">
+      <div className="flex flex-col items-center justify-center h-48 text-center gap-3 px-5">
         <div className="w-10 h-10 rounded-2xl bg-slate-800/50 border border-slate-700/40 flex items-center justify-center">
           <Sparkles size={18} className="text-slate-500" />
         </div>
@@ -53,7 +53,7 @@ export function SynergyPanel({ selectedIds }: Props) {
   return (
     <div className="space-y-2">
       {/* Score card */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-900/50 p-3.5 mb-3">
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-900/50 p-4 mb-3">
         <div className="flex items-end justify-between mb-2.5">
           <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Build Score</span>
           <span className={`text-2xl font-bold tabular-nums leading-none
@@ -89,7 +89,7 @@ export function SynergyPanel({ selectedIds }: Props) {
             {/* Strength stripe */}
             <div className={`h-[2.5px] ${cfg.bar}`} style={{ width: cfg.width }} />
 
-            <div className="px-3.5 py-3 space-y-2">
+            <div className="px-4 py-3.5 space-y-2.5">
               {/* Pair names */}
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full flex-shrink-0 ${tierDot[a.tier]}`} />
