@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   FlaskConical, Package, Beaker, Network,
   LayoutTemplate, BookOpen, LineChart, StickyNote,
-  Shield, ClipboardCheck, Brain, CalendarDays, Settings, LogOut,
+  Shield, ClipboardCheck, Brain, CalendarDays, Settings, LogOut, BarChart2,
 } from 'lucide-react'
 import { Builder }        from './pages/Builder'
 import { MyBuilds }       from './pages/MyBuilds'
@@ -12,6 +12,7 @@ import { Chart }          from './pages/Chart'
 import { Journal }        from './pages/Journal'
 import { Plan }           from './pages/Plan'
 import { Calendar }       from './pages/Calendar'
+import { RecapPage }      from './recap/RecapPage'
 import { KillZoneClock }  from './components/KillZoneClock'
 import { SessionNotes }   from './components/SessionNotes'
 import { TradingRules }   from './components/TradingRules'
@@ -27,7 +28,7 @@ const SUPABASE_CONFIGURED = !!(
   import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY
 )
 
-type Tab = 'builder' | 'chart' | 'map' | 'plan' | 'journal' | 'calendar' | 'templates' | 'builds'
+type Tab = 'builder' | 'chart' | 'map' | 'plan' | 'journal' | 'calendar' | 'templates' | 'builds' | 'recap'
 
 const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'builder',   label: 'Builder',   Icon: Beaker         },
@@ -38,6 +39,7 @@ const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'calendar',  label: 'Calendar',  Icon: CalendarDays   },
   { id: 'templates', label: 'Templates', Icon: LayoutTemplate },
   { id: 'builds',    label: 'Builds',    Icon: Package        },
+  { id: 'recap',     label: 'Recap',     Icon: BarChart2      },
 ]
 
 export default function App() {
@@ -209,6 +211,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
         {tab === 'calendar'  && <Calendar />}
         {tab === 'templates' && <Templates onLoad={handleLoadBuild} />}
         {tab === 'builds'    && <MyBuilds  onLoadBuild={handleLoadBuild} />}
+        {tab === 'recap'     && <RecapPage />}
       </main>
 
       <SessionNotes  open={notesOpen}    onClose={() => setNotesOpen(false)} />

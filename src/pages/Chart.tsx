@@ -131,7 +131,7 @@ export function Chart() {
   const [guideOpen,   setGuideOpen]   = useState(false)
   const { builds }                    = useBuilds()
 
-  const activePreset = PRESETS.find(p => p.symbol === symbol)
+  const _activePreset = PRESETS.find(p => p.symbol === symbol); void _activePreset
   const activeBuild  = builds.find(b => b.id === buildId)
   const conceptList  = (activeBuild?.conceptIds ?? []).map(id => getConceptById(id)).filter(Boolean)
 
