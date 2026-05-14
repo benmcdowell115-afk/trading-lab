@@ -71,11 +71,11 @@ export default function App() {
     )
   }
 
+  // Mobile: landing page only — no auth wall on mobile, just the landing
+  if (isMobile) return <Landing />
+
   // Show login if Supabase is configured but user is not authenticated
   if (SUPABASE_CONFIGURED && !user) return <LoginScreen />
-
-  // Mobile: landing page only — full app is desktop + native app
-  if (isMobile) return <Landing />
 
   // Desktop: landing first, then full app on "Launch"
   if (!enteredApp) return <Landing onLaunch={() => setEnteredApp(true)} />
