@@ -104,7 +104,7 @@ export function Builder({ initialBuild }: Props) {
     <div className="flex flex-col flex-1 overflow-hidden">
 
       {/* Library / Mastery toggle */}
-      <div className="flex bg-slate-900/60 border border-slate-800/60 rounded-xl p-0.5 gap-0.5 mx-5 mt-5 mb-3 flex-shrink-0">
+      <div className="flex bg-slate-900/60 border border-slate-800/60 rounded-xl p-0.5 gap-0.5 mx-6 mt-5 mb-3 flex-shrink-0">
         <button
           onClick={() => setLeftTab('library')}
           className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${leftTab === 'library' ? 'bg-slate-700 text-slate-100' : 'text-slate-500 hover:text-slate-300'}`}
@@ -124,7 +124,7 @@ export function Builder({ initialBuild }: Props) {
       ) : (
         <>
           {/* Search + filters */}
-          <div className="px-5 pb-5 space-y-2.5 border-b border-slate-800/40 flex-shrink-0">
+          <div className="px-6 pb-5 pt-1 space-y-3 border-b border-slate-800/40 flex-shrink-0">
             <div className="relative">
               <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
               <input
@@ -205,7 +205,7 @@ export function Builder({ initialBuild }: Props) {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden border-b border-amber-500/15 bg-amber-500/4 flex-shrink-0"
               >
-                <div className="px-5 pt-4 pb-3">
+                <div className="px-6 pt-4 pb-3">
                   <div className="flex items-center gap-1.5 mb-2">
                     <Bookmark size={11} className="text-amber-400 fill-amber-400" />
                     <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Studying Now</span>
@@ -234,7 +234,7 @@ export function Builder({ initialBuild }: Props) {
           </AnimatePresence>
 
           {/* Concept list */}
-          <div className="flex-1 overflow-y-auto px-5 py-3 space-y-2.5">
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2.5">
             <AnimatePresence mode="popLayout">
               {filtered.map(concept => (
                 <ConceptCard
@@ -260,7 +260,7 @@ export function Builder({ initialBuild }: Props) {
   const WorkbenchPanel = (
     <div className="flex flex-col flex-1 overflow-hidden min-w-0">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 md:px-6 py-3 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0 gap-2 flex-wrap">
+      <div className="flex items-center justify-between px-6 py-3.5 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0 gap-2 flex-wrap">
         <div className="min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap">
             <h2 className="text-[15px] font-bold text-white truncate">
@@ -373,7 +373,7 @@ export function Builder({ initialBuild }: Props) {
   // ── Synergy panel
   const SynergyPanelContent = (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-800/50 flex-shrink-0">
+      <div className="flex items-center gap-2.5 px-6 py-4 border-b border-slate-800/50 flex-shrink-0">
         <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/25 flex items-center justify-center">
           <Zap size={12} className="text-amber-400" />
         </div>
@@ -384,7 +384,7 @@ export function Builder({ initialBuild }: Props) {
           </span>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-5">
         <BuildRadar selectedIds={selectedIds} />
         <SynergyPanel selectedIds={selectedIds} />
         <BuildSuggestions selectedIds={selectedIds} onAdd={toggle} />
