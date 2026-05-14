@@ -161,44 +161,49 @@ export function ConceptMap() {
 
           {/* Nodes */}
           {concepts.map(c => {
-            const p        = positions.get(c.id); if (!p) return null
-            const isHov    = hovered === c.id
+            const p         = positions.get(c.id); if (!p) return null
+            const isHov     = hovered === c.id
             const isHighlit = highlighted.has(c.id)
-            const inBuild  = activeIds ? activeIds.includes(c.id) : false
-            const dimmed   = hovered ? !isHighlit : activeIds ? !inBuild : false
-            const r        = isHov ? NODE_R + 3 : inBuild ? NODE_R + 1 : NODE_R
-            const fill     = getNodeFill(c.id)
-            const glow     = getNodeGlow(c.id)
+            const inBuild   = activeIds ? activeIds.includes(c.id) : false
+            const dimmed    = hovered ? !isHighlit : activeIds ? !inBuild : false
+            const fill      = getNodeFill(c.id)
+            const stroke    = getNodeStroke(c.id)
+            const glow      = getNodeGlow(c.id)
+            const showLabel = isHov || (isHighlit && !!hovered)
 
             return (
-              <g key={c.id} transform={`translate(${p.x},${p.y})`}
-                onMouseEnter={() => setHovered(c.id)}
-                onMouseLeave={() => setHovered(null)}
-                onClick={e => { e.stopPropagation(); setHovered(prev => prev === c.id ? null : c.id) }}
-                style={{ cursor: 'pointer' }}
-              >
-                {(isHov || (inBuild && !hovered)) && (
-                  <circle r={r + 5} fill="none" stroke={fill} strokeWidth="1"
-                    opacity={isHov ? 0.5 : 0.25} filter={`url(#glow-${glow})`} />
-                )}
-                <circle r={r}
+              <g key={c.id} transform={`translate(${p.x},${p.y})`} style={{ cursor: 'pointer' }}>
+                {/* Pulse ring — always rendered, opacity-transitioned to avoid pop-in */}
+                <circle r={NODE_R + 8} fill="none" stroke={fill} strokeWidth="1"
+                  opacity={isHov ? 0.45 : (inBuild && !hovered) ? 0.2 : 0}
+                  filter={isHov ? `url(#glow-${glow})` : undefined}
+                  style={{ transition: 'opacity 0.18s' }}
+                />
+                {/* Main node circle */}
+                <circle r={NODE_R}
                   fill={fill}
                   fillOpacity={isHov ? 0.9 : inBuild ? 0.55 : dimmed ? 0.06 : colorMode === 'mastery' ? 0.45 : 0.22}
-                  stroke={getNodeStroke(c.id)}
+                  stroke={stroke}
                   strokeWidth={isHov ? 2 : inBuild ? 1.5 : 1}
                   strokeOpacity={isHov ? 1 : inBuild ? 0.8 : dimmed ? 0.08 : colorMode === 'mastery' ? 0.7 : 0.4}
                   filter={isHov ? `url(#glow-${glow})` : undefined}
-                  style={{ transition: 'all 0.2s' }}
+                  style={{ transition: 'fill-opacity 0.15s, stroke-opacity 0.15s, stroke-width 0.15s' }}
                 />
-                {(isHov || (highlighted.has(c.id) && hovered)) && (
-                  <text y={r + 14} textAnchor="middle" fontSize="9.5"
-                    fontWeight={isHov ? '700' : '500'}
-                    fill={isHov ? fill : '#94a3b8'}
-                    fontFamily="Inter, sans-serif"
-                    style={{ pointerEvents: 'none', userSelect: 'none' }}>
-                    {c.shortName}
-                  </text>
-                )}
+                {/* Label — pinned Y so it never jumps */}
+                <text y={NODE_R + 14} textAnchor="middle" fontSize="9.5"
+                  fontWeight={isHov ? '700' : '500'}
+                  fill={isHov ? fill : '#94a3b8'}
+                  opacity={showLabel ? 1 : 0}
+                  fontFamily="Inter, sans-serif"
+                  style={{ pointerEvents: 'none', userSelect: 'none', transition: 'opacity 0.15s' }}>
+                  {c.shortName}
+                </text>
+                {/* Fixed-size invisible hit target — prevents hover flicker when node visually grows */}
+                <circle r={NODE_R + 8} fill="transparent"
+                  onMouseEnter={() => setHovered(c.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  onClick={e => { e.stopPropagation(); setHovered(prev => prev === c.id ? null : c.id) }}
+                />
               </g>
             )
           })}
