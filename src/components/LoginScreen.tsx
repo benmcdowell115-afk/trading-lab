@@ -42,7 +42,9 @@ async function signInWithKey(key: string): Promise<string | null> {
 }
 
 export function LoginScreen() {
-  const [key,     setKey]     = useState('')
+  // Auto-fill key from URL param — Whop can pass ?key=C-XXXXX in the redirect URL
+  const urlKey = new URLSearchParams(window.location.search).get('key') ?? ''
+  const [key,     setKey]     = useState(urlKey)
   const [error,   setError]   = useState('')
   const [loading, setLoading] = useState(false)
   const [done,    setDone]    = useState(false)
@@ -97,7 +99,7 @@ export function LoginScreen() {
               <div className="space-y-1">
                 <p className="text-[17px] font-bold text-white">Activate your copy</p>
                 <p className="text-[12.5px] text-slate-500 leading-relaxed">
-                  Paste the license key from your Whop dashboard below.
+                  Find your key on Whop: <span className="text-slate-400">My Purchases → ICT/SMC Trading Lab → License Key</span>. It starts with <span className="text-amber-400 font-mono">C-</span>
                 </p>
               </div>
 
@@ -107,7 +109,7 @@ export function LoginScreen() {
                   value={key}
                   onChange={e => { setKey(e.target.value); setError('') }}
                   onKeyDown={e => e.key === 'Enter' && activate()}
-                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  placeholder="C-XXXXXX-XXXXXXXX-XXXXXXXX"
                   autoFocus
                   spellCheck={false}
                   autoComplete="off"
