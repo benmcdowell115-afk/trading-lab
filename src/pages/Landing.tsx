@@ -577,27 +577,22 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {TOOLS.map(t => (
               <div key={t.name}
-                className="group relative rounded-2xl p-6 overflow-hidden transition-all duration-300 cursor-default hover:-translate-y-2"
+                className="group relative rounded-2xl p-6 overflow-hidden transition-all duration-300 cursor-default hover:-translate-y-2 text-center flex flex-col items-center"
                 style={{ background: 'rgba(6,6,12,0.98)', border: `1px solid rgba(255,255,255,0.055)` }}>
-                {/* Top glow line */}
                 <div className="absolute top-0 inset-x-0 h-[2px] rounded-t-2xl opacity-35 group-hover:opacity-100 transition-opacity duration-300"
                   style={{ background: `linear-gradient(90deg,transparent,${t.color},transparent)` }} />
-                {/* Fill glow */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                   style={{ background: `radial-gradient(ellipse 90% 55% at 50% 0%,${t.color}0c,transparent 70%)` }} />
-                {/* Tag */}
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-[32px] leading-none transition-transform duration-300 group-hover:scale-110 origin-left">{t.emoji}</span>
-                  <span className="text-[9px] font-bold tracking-[0.2em] uppercase px-2 py-0.5 rounded-full"
-                    style={{ color: t.color, background: `${t.color}12`, border: `1px solid ${t.color}25` }}>
-                    {t.tag}
-                  </span>
-                </div>
+                <span className="text-[34px] leading-none mb-3 transition-transform duration-300 group-hover:scale-110">{t.emoji}</span>
+                <span className="text-[9px] font-bold tracking-[0.2em] uppercase px-2.5 py-0.5 rounded-full mb-4"
+                  style={{ color: t.color, background: `${t.color}12`, border: `1px solid ${t.color}25` }}>
+                  {t.tag}
+                </span>
                 <h3 className="text-[14px] font-bold text-white mb-2">{t.name}</h3>
                 <p className="text-[12.5px] text-slate-500 leading-relaxed">{t.desc}</p>
-                <div className="mt-5 flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: t.color, opacity: 0.7 }} />
-                  <div className="h-px max-w-[56px] flex-1" style={{ background: `linear-gradient(90deg,${t.color}50,transparent)` }} />
+                <div className="mt-5 flex items-center justify-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.color, opacity: 0.7 }} />
+                  <div className="h-px w-10" style={{ background: `linear-gradient(90deg,${t.color}50,transparent)` }} />
                 </div>
               </div>
             ))}
@@ -642,27 +637,22 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
               Built for the serious trader.
             </h2>
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {FEATURE_COLS.map(col => (
-              <div key={col.heading} className="relative rounded-2xl overflow-hidden"
+              <div key={col.heading} className="relative rounded-2xl p-7 overflow-hidden text-center flex flex-col items-center"
                 style={{ background: 'rgba(7,7,14,0.98)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                {/* Left color bar */}
-                <div className="absolute top-0 left-0 bottom-0 w-[2px]" style={{ background: col.color, opacity: 0.6 }} />
-                <div className="flex flex-col md:flex-row md:items-center gap-5 md:gap-8 px-7 py-6 pl-9">
-                  {/* Category label */}
-                  <div className="flex-shrink-0 md:w-36">
-                    <p className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: col.color }}>{col.heading}</p>
-                  </div>
-                  {/* Items as chips */}
-                  <div className="flex flex-wrap gap-2">
-                    {col.items.map(item => (
-                      <span key={item}
-                        className="px-3 py-1 rounded-lg text-[11.5px] font-medium text-slate-400 whitespace-nowrap"
-                        style={{ background: `${col.color}0d`, border: `1px solid ${col.color}22` }}>
-                        {item}
-                      </span>
-                    ))}
-                  </div>
+                <div className="absolute top-0 inset-x-0 h-[1px]"
+                  style={{ background: `linear-gradient(90deg,transparent,${col.color}55,transparent)` }} />
+                <div className="w-[2px] h-8 rounded-full mb-4" style={{ background: col.color, opacity: 0.7 }} />
+                <p className="text-[11px] font-black tracking-[0.22em] uppercase mb-5" style={{ color: col.color }}>{col.heading}</p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {col.items.map(item => (
+                    <span key={item}
+                      className="px-3 py-1 rounded-lg text-[11.5px] font-medium text-slate-400"
+                      style={{ background: `${col.color}0d`, border: `1px solid ${col.color}22` }}>
+                      {item}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}
