@@ -285,7 +285,7 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {STEPS.map((s, i) => (
-              <div key={s.n} className="relative group rounded-2xl p-7 overflow-hidden"
+              <div key={s.n} className="relative group rounded-2xl p-7 overflow-hidden text-center"
                 style={{ background: 'rgba(7,7,14,0.98)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="absolute top-0 inset-x-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   style={{ background: 'linear-gradient(90deg,transparent,rgba(245,158,11,0.5),transparent)' }} />
@@ -354,14 +354,14 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {FEATURE_COLS.map(col => (
-              <div key={col.heading} className="flex flex-col items-center md:items-start text-center md:text-left">
+              <div key={col.heading} className="flex flex-col items-center text-center">
                 <div className="inline-flex items-center gap-2 mb-6">
                   <div className="w-1.5 h-5 rounded-full" style={{ background: col.color, opacity: 0.7 }} />
                   <p className="text-[12px] font-bold tracking-[0.18em] uppercase" style={{ color: col.color }}>{col.heading}</p>
                 </div>
                 <ul className="space-y-3 w-full">
                   {col.items.map(item => (
-                    <li key={item} className="flex items-center gap-3 justify-center md:justify-start">
+                    <li key={item} className="flex items-center gap-3 justify-center">
                       <span className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
                         style={{ background: `${col.color}18`, border: `1px solid ${col.color}35` }}>
                         <Check size={9} style={{ color: col.color }} />
