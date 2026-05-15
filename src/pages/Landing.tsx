@@ -312,6 +312,13 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
         }
         .animate-cta-pulse { animation:cta-pulse 3s ease-in-out infinite; }
         .animate-badge-glow { animation:badge-glow 2.5s ease-in-out infinite; }
+        /* Force classic margin centering on all max-w containers.
+           Tailwind v4 compiles mx-auto to margin-inline:auto which can
+           mis-render in certain flex/grid parent contexts. */
+        [class*="max-w-"] {
+          margin-left: auto;
+          margin-right: auto;
+        }
       `}</style>
 
       {/* ── Nav ───────────────────────────────────────────────────── */}
