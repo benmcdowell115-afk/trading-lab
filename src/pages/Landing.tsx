@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FlaskConical, ArrowRight, ExternalLink, Check, TrendingUp, Brain, Target } from 'lucide-react'
 
 const WHOP_URL = import.meta.env.VITE_WHOP_BUY_URL as string | undefined
@@ -52,31 +52,34 @@ function ConceptMapBg({ opacity = 0.09 }: { opacity?: number }) {
   return (
     <svg viewBox="0 0 1100 680" className="absolute inset-0 w-full h-full"
       preserveAspectRatio="xMidYMid slice" style={{ opacity }} aria-hidden>
-      {MAP_EDGES.map(([a, b], i) => {
-        const na = MAP_NODES[a], nb = MAP_NODES[b]
-        return (
-          <line key={i} x1={na.x} y1={na.y} x2={nb.x} y2={nb.y}
-            stroke="rgba(255,255,255,0.5)" strokeWidth="1"
-            style={{ animation: `edge-shimmer ${3 + (i % 7) * 0.4}s ease-in-out infinite`, animationDelay: `${(i * 0.18) % 3}s` }}
-          />
-        )
-      })}
-      {MAP_NODES.map((n, i) => (
-        <g key={i}>
-          <circle cx={n.x} cy={n.y} r={n.r + 9} fill={n.color} fillOpacity="0"
-            stroke={n.color} strokeWidth="1.5" strokeOpacity="0.15"
-            style={{ animation: `ring-breathe ${2.8 + i * 0.11}s ease-in-out infinite`, animationDelay: `${(i * 0.22) % 2.5}s` }}
-          />
-          <circle cx={n.x} cy={n.y} r={n.r} fill={n.color} fillOpacity="0.3"
-            stroke={n.color} strokeWidth="1.5" strokeOpacity="0.85"
-            style={{ animation: `node-breathe ${2.5 + i * 0.13}s ease-in-out infinite`, animationDelay: `${(i * 0.19) % 2}s` }}
-          />
-          <text x={n.x} y={n.y + n.r + 12} textAnchor="middle" fill="white"
-            fontSize="9" fontFamily="system-ui" fontWeight="600" fillOpacity="0.8">
-            {n.label}
-          </text>
-        </g>
-      ))}
+      {/* Single group that slowly drifts across the screen */}
+      <g style={{ animation: 'map-drift 55s ease-in-out infinite' }}>
+        {MAP_EDGES.map(([a, b], i) => {
+          const na = MAP_NODES[a], nb = MAP_NODES[b]
+          return (
+            <line key={i} x1={na.x} y1={na.y} x2={nb.x} y2={nb.y}
+              stroke="rgba(255,255,255,0.5)" strokeWidth="1"
+              style={{ animation: `edge-shimmer ${3 + (i % 7) * 0.4}s ease-in-out infinite`, animationDelay: `${(i * 0.18) % 3}s` }}
+            />
+          )
+        })}
+        {MAP_NODES.map((n, i) => (
+          <g key={i}>
+            <circle cx={n.x} cy={n.y} r={n.r + 9} fill={n.color} fillOpacity="0"
+              stroke={n.color} strokeWidth="1.5" strokeOpacity="0.15"
+              style={{ animation: `ring-breathe ${2.8 + i * 0.11}s ease-in-out infinite`, animationDelay: `${(i * 0.22) % 2.5}s` }}
+            />
+            <circle cx={n.x} cy={n.y} r={n.r} fill={n.color} fillOpacity="0.3"
+              stroke={n.color} strokeWidth="1.5" strokeOpacity="0.85"
+              style={{ animation: `node-breathe ${2.5 + i * 0.13}s ease-in-out infinite`, animationDelay: `${(i * 0.19) % 2}s` }}
+            />
+            <text x={n.x} y={n.y + n.r + 12} textAnchor="middle" fill="white"
+              fontSize="9" fontFamily="system-ui" fontWeight="600" fillOpacity="0.8">
+              {n.label}
+            </text>
+          </g>
+        ))}
+      </g>
     </svg>
   )
 }
@@ -139,7 +142,25 @@ const PILLS = [
 // ── Component ─────────────────────────────────────────────────────────────────
 export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
   const [visible, setVisible] = useState(false)
+  const heroMapRef = useRef<HTMLDivElement>(null)
+  const ctaMapRef  = useRef<HTMLDivElement>(null)
+
   useEffect(() => { const t = setTimeout(() => setVisible(true), 40); return () => clearTimeout(t) }, [])
+
+  // Scroll parallax — each map container moves at 20% of scroll speed
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY
+      if (heroMapRef.current) heroMapRef.current.style.transform = `translateY(${y * 0.18}px)`
+      if (ctaMapRef.current) {
+        const rect = ctaMapRef.current.parentElement?.getBoundingClientRect()
+        const offset = rect ? (window.scrollY + rect.top) : 0
+        ctaMapRef.current.style.transform = `translateY(${(y - offset) * 0.18}px)`
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const anim = (delay: number) => ({
     className: `transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`,
@@ -186,6 +207,15 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
         @keyframes cta-pulse {
           0%,100% { box-shadow:0 0 50px rgba(245,158,11,0.22),0 4px 20px rgba(245,158,11,0.14); }
           50%      { box-shadow:0 0 80px rgba(245,158,11,0.38),0 8px 32px rgba(245,158,11,0.22); }
+        }
+        @keyframes map-drift {
+          0%   { transform:translate(0px,0px); }
+          18%  { transform:translate(-55px,-38px); }
+          36%  { transform:translate(-20px,-75px); }
+          54%  { transform:translate(48px,-55px); }
+          72%  { transform:translate(30px,-18px); }
+          88%  { transform:translate(-22px,8px); }
+          100% { transform:translate(0px,0px); }
         }
         @keyframes line-grow {
           from { transform:scaleX(0); }
@@ -236,12 +266,14 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-14 pb-28 px-5 text-center overflow-hidden">
 
-        {/* Concept map — animated nodes */}
-        <ConceptMapBg opacity={0.22} />
+        {/* Concept map — parallax wrapper */}
+        <div ref={heroMapRef} className="absolute inset-0 will-change-transform">
+          <ConceptMapBg opacity={0.22} />
+        </div>
 
-        {/* Radial fade — keeps center readable, reveals edges */}
+        {/* Fade: visible at top & bottom edges, dark in the middle where text lives */}
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 20%, #05050a 82%)' }} />
+          style={{ background: 'linear-gradient(to bottom, rgba(5,5,10,0.05) 0%, rgba(5,5,10,0.94) 30%, rgba(5,5,10,0.94) 70%, rgba(5,5,10,0.05) 100%)' }} />
 
         {/* Floating amber orb */}
         <div className="absolute pointer-events-none"
@@ -544,10 +576,14 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
 
       {/* ── Bottom CTA ────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-t border-slate-800/50" style={{ minHeight: '600px' }}>
-        <ConceptMapBg opacity={0.22} />
-        {/* Deep radial fade */}
+        {/* Concept map — parallax wrapper */}
+        <div ref={ctaMapRef} className="absolute inset-0 will-change-transform">
+          <ConceptMapBg opacity={0.22} />
+        </div>
+
+        {/* Fade: visible at top & bottom, dark center */}
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 75% 75% at 50% 50%, transparent 18%, #05050a 80%)' }} />
+          style={{ background: 'linear-gradient(to bottom, rgba(5,5,10,0.05) 0%, rgba(5,5,10,0.92) 28%, rgba(5,5,10,0.92) 72%, rgba(5,5,10,0.05) 100%)' }} />
         {/* Amber bloom from below */}
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse 100% 60% at 50% 100%, rgba(245,158,11,0.12) 0%, transparent 65%)' }} />
