@@ -41,7 +41,7 @@ async function signInWithKey(key: string): Promise<string | null> {
   return finalErr?.message ?? null
 }
 
-export function LoginScreen() {
+export function LoginScreen({ onBack }: { onBack?: () => void }) {
   // Auto-fill key from URL param — Whop can pass ?key=C-XXXXX in the redirect URL
   const urlKey = new URLSearchParams(window.location.search).get('key') ?? ''
   const [key,     setKey]     = useState(urlKey)
@@ -78,6 +78,12 @@ export function LoginScreen() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#05050a] px-5 py-10">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(245,158,11,0.05)_0%,_transparent_65%)]" />
+
+      {onBack && (
+        <button onClick={onBack} className="absolute top-6 left-6 flex items-center gap-1.5 text-[12px] text-slate-600 hover:text-slate-300 transition-colors">
+          ← Back
+        </button>
+      )}
 
       <div className="relative w-full max-w-[360px] flex flex-col gap-7 text-center">
 
