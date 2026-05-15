@@ -3,6 +3,7 @@ import { FlaskConical } from 'lucide-react'
 
 interface Props {
   onLaunch?: () => void
+  onSignIn?: () => void
 }
 
 const FEATURES = [
@@ -56,7 +57,7 @@ const STATS = [
   { val: '10',  label: 'Themes'   },
 ]
 
-export function Landing({ onLaunch }: Props) {
+export function Landing({ onLaunch, onSignIn }: Props) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => { const t = setTimeout(() => setMounted(true), 40); return () => clearTimeout(t) }, [])
 
@@ -156,6 +157,18 @@ export function Landing({ onLaunch }: Props) {
                 <span className="text-[13px] font-medium text-slate-500">📱 Mobile app coming soon</span>
               </div>
             </>
+          ) : onSignIn ? (
+            <button
+              onClick={onSignIn}
+              className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-[15px] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                color: '#0a0800',
+                boxShadow: '0 0 50px rgba(245,158,11,0.25), 0 4px 20px rgba(245,158,11,0.15)',
+              }}>
+              Sign In with License Key
+              <span className="group-hover:translate-x-1 transition-transform duration-200 text-[17px]">→</span>
+            </button>
           ) : (
             /* Mobile only — no launch button */
             <div className="flex flex-col items-center gap-4">

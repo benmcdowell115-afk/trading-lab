@@ -47,7 +47,7 @@ const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
 const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768
 
 export default function App() {
-  if (IS_MOBILE) return <Landing />
+  if (IS_MOBILE) return <Landing onSignIn={() => window.location.reload()} />
   return <DesktopApp />
 }
 
@@ -73,7 +73,7 @@ function DesktopApp() {
   }
 
   if (SUPABASE_CONFIGURED && !user) return <LoginScreen />
-  if (!enteredApp) return <Landing onLaunch={() => setEnteredApp(true)} />
+  if (!enteredApp) return <Landing onLaunch={() => setEnteredApp(true)} onSignIn={SUPABASE_CONFIGURED ? signOut : undefined} />
 
   return <AppShell signOut={SUPABASE_CONFIGURED ? signOut : undefined} userEmail={user?.email} />
 }
