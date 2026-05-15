@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { FlaskConical, ArrowRight, ExternalLink, Check, TrendingUp, Brain, Target } from 'lucide-react'
+import { FlaskConical, ArrowRight, ExternalLink, TrendingUp, Brain, Target } from 'lucide-react'
 
 const WHOP_URL = import.meta.env.VITE_WHOP_BUY_URL as string | undefined
 
@@ -138,6 +138,91 @@ const PILLS = [
   { label: 'PDH / PDL',        color: '#34d399' },
   { label: 'Swing H&L',        color: '#34d399' },
 ]
+
+// ── Terminal boot sequence ────────────────────────────────────────────────────
+const BOOT_LINES = [
+  { text: 'TRADING LAB  /  SYSTEM INITIALIZING',          type: 'header'  },
+  { text: '─────────────────────────────────────────────', type: 'divider' },
+  { text: '▸  market structure analysis ........  LOADED', type: 'item'    },
+  { text: '▸  liquidity zone mapping ...........  LOADED', type: 'item'    },
+  { text: '▸  fvg + order block engine .........  LOADED', type: 'item'    },
+  { text: '▸  amd cycle framework ..............  LOADED', type: 'item'    },
+  { text: '▸  kill zone scheduler ..............  LOADED', type: 'item'    },
+  { text: '▸  trade journal + analytics ........  LOADED', type: 'item'    },
+  { text: '▸  synergy detection engine .........  LOADED', type: 'item'    },
+  { text: '▸  recap + video export engine ......  LOADED', type: 'item'    },
+  { text: '─────────────────────────────────────────────', type: 'divider' },
+  { text: '✓  ALL SYSTEMS ONLINE — YOUR EDGE IS LIVE',    type: 'success'  },
+]
+
+function Terminal() {
+  const [count, setCount] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
+  const started = useRef(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !started.current) {
+        started.current = true
+        BOOT_LINES.forEach((_, i) => {
+          setTimeout(() => setCount(i + 1), i * 280)
+        })
+        observer.disconnect()
+      }
+    }, { threshold: 0.35 })
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div ref={ref} className="relative rounded-2xl overflow-hidden mx-auto"
+      style={{ background: '#080810', border: '1px solid rgba(245,158,11,0.15)', maxWidth: '680px',
+        boxShadow: '0 0 60px rgba(245,158,11,0.08), 0 0 120px rgba(245,158,11,0.04), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+
+      {/* Terminal top bar */}
+      <div className="flex items-center gap-2 px-5 py-3 border-b border-slate-800/60"
+        style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+        <div className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
+        <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+        <span className="ml-3 text-[10px] text-slate-600 font-mono tracking-widest uppercase">tradinglab — bash</span>
+      </div>
+
+      {/* Terminal body */}
+      <div className="px-6 py-6 min-h-[320px]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+        {BOOT_LINES.slice(0, count).map((line, i) => (
+          <div key={i} className="leading-relaxed"
+            style={{
+              fontSize: 'clamp(11px, 2.2vw, 13px)',
+              color: line.type === 'header'  ? '#f59e0b'
+                   : line.type === 'success' ? '#34d399'
+                   : line.type === 'divider' ? 'rgba(255,255,255,0.08)'
+                   : 'rgba(148,163,184,0.7)',
+              fontWeight: line.type === 'header' || line.type === 'success' ? 700 : 400,
+              marginBottom: line.type === 'divider' ? '4px' : '2px',
+              letterSpacing: line.type === 'header' || line.type === 'success' ? '0.1em' : '0.04em',
+              textShadow: line.type === 'success' ? '0 0 20px rgba(52,211,153,0.5)' : line.type === 'header' ? '0 0 20px rgba(245,158,11,0.4)' : 'none',
+            }}>
+            {line.text}
+            {/* "LOADED" in green */}
+            {line.type === 'item' && (
+              <span style={{ color: '#34d399', fontWeight: 600 }}></span>
+            )}
+          </div>
+        ))}
+        {/* Blinking cursor */}
+        {count > 0 && count < BOOT_LINES.length && (
+          <span className="inline-block w-2 h-3.5 ml-0.5 animate-pulse"
+            style={{ background: '#f59e0b', verticalAlign: 'middle', opacity: 0.8 }} />
+        )}
+      </div>
+
+      {/* Ambient glow lines */}
+      <div className="absolute bottom-0 inset-x-0 h-[1px]"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(52,211,153,0.3), transparent)' }} />
+    </div>
+  )
+}
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
@@ -396,33 +481,40 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
         </div>
       </div>
 
-      {/* ── Bold statement ────────────────────────────────────────── */}
-      <section className="relative px-5 py-24 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 70% 100% at 50% 50%, rgba(245,158,11,0.04) 0%, transparent 70%)' }} />
-        <div className="relative max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 mb-8 px-3 py-1 rounded-full border border-slate-800/80 bg-slate-900/40">
-            <span className="w-1 h-1 rounded-full bg-amber-500/60" />
-            <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-slate-600">The Foundation</span>
+      {/* ── The Foundation ────────────────────────────────────────── */}
+      <section className="px-5 pb-28 border-t border-slate-800/30">
+        <div className="max-w-5xl mx-auto pt-24">
+          <div className="text-center mb-16">
+            <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-amber-500/60 mb-3">The Foundation</p>
+            <h2 className="font-black text-white" style={{ fontSize: 'clamp(26px,4vw,40px)', letterSpacing: '-1px' }}>
+              What separates consistent traders.
+            </h2>
           </div>
-          <h2 className="font-black text-white leading-[0.92] mb-8"
-            style={{ fontSize: 'clamp(32px,6vw,58px)', letterSpacing: '-2px' }}>
-            Most traders fail because<br />
-            <span style={{
-              background: 'linear-gradient(125deg,#fbbf24,#f59e0b 45%,#fde68a)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-            }}>they react.</span>
-            {' '}ICT traders<br />
-            <span className="text-white">anticipate.</span>
-          </h2>
-          <p className="text-[15px] text-slate-500 max-w-md mx-auto leading-relaxed">
-            The Trading Lab is where you build the mental models, the system, and the review process that separates consistently profitable traders from everyone else.
-          </p>
-          {/* Decorative line */}
-          <div className="mt-10 flex items-center justify-center gap-4">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-amber-500/30" />
-            <FlaskConical size={14} className="text-amber-500/40" />
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-amber-500/30" />
+          {/* Single large card — same dark style as The Process */}
+          <div className="relative group rounded-2xl p-10 md:p-14 overflow-hidden text-center"
+            style={{ background: 'rgba(7,7,14,0.98)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="absolute top-0 inset-x-0 h-[1px] opacity-50"
+              style={{ background: 'linear-gradient(90deg,transparent,rgba(245,158,11,0.6),transparent)' }} />
+            <div className="absolute inset-0 pointer-events-none"
+              style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,158,11,0.04), transparent 65%)' }} />
+            <div className="relative max-w-2xl mx-auto">
+              <p className="font-black leading-[0.9] mb-6 text-center"
+                style={{ fontSize: 'clamp(28px,5.5vw,52px)', letterSpacing: '-2px' }}>
+                <span className="text-slate-400">Most traders fail because</span><br />
+                <span className="text-white">they </span>
+                <span style={{ background: 'linear-gradient(125deg,#fbbf24,#f59e0b 45%,#fde68a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>react.</span>
+              </p>
+              <p className="font-black leading-[0.9] mb-10 text-center"
+                style={{ fontSize: 'clamp(28px,5.5vw,52px)', letterSpacing: '-2px' }}>
+                <span className="text-white">ICT traders </span>
+                <span style={{ color: '#34d399', textShadow: '0 0 30px rgba(52,211,153,0.4)' }}>anticipate.</span>
+              </p>
+              <div className="h-px max-w-[120px] mx-auto mb-10"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.35), transparent)' }} />
+              <p className="text-[14.5px] text-slate-500 leading-relaxed max-w-lg mx-auto">
+                The Trading Lab is where you build the mental models, the system, and the review process that separates consistently profitable traders from everyone else.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -539,10 +631,10 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
         </div>
       </section>
 
-      {/* ── Feature checklist ─────────────────────────────────────── */}
+      {/* ── Everything included — horizontal stacked cards ────────── */}
       <section className="relative px-5 py-28 border-t border-slate-800/30 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 50%, rgba(245,158,11,0.035) 0%, transparent 70%)' }} />
+          style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 50%, rgba(245,158,11,0.03) 0%, transparent 70%)' }} />
         <div className="relative max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-amber-500/60 mb-3">Everything included</p>
@@ -550,27 +642,46 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
               Built for the serious trader.
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="flex flex-col gap-4">
             {FEATURE_COLS.map(col => (
-              <div key={col.heading} className="flex flex-col items-center text-center">
-                <div className="inline-flex items-center gap-2 mb-6">
-                  <div className="w-1.5 h-5 rounded-full" style={{ background: col.color, opacity: 0.7 }} />
-                  <p className="text-[12px] font-bold tracking-[0.18em] uppercase" style={{ color: col.color }}>{col.heading}</p>
-                </div>
-                <ul className="space-y-3 w-full">
-                  {col.items.map(item => (
-                    <li key={item} className="flex items-center gap-3 justify-center">
-                      <span className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
-                        style={{ background: `${col.color}18`, border: `1px solid ${col.color}35` }}>
-                        <Check size={9} style={{ color: col.color }} />
+              <div key={col.heading} className="relative rounded-2xl overflow-hidden"
+                style={{ background: 'rgba(7,7,14,0.98)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                {/* Left color bar */}
+                <div className="absolute top-0 left-0 bottom-0 w-[2px]" style={{ background: col.color, opacity: 0.6 }} />
+                <div className="flex flex-col md:flex-row md:items-center gap-5 md:gap-8 px-7 py-6 pl-9">
+                  {/* Category label */}
+                  <div className="flex-shrink-0 md:w-36">
+                    <p className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: col.color }}>{col.heading}</p>
+                  </div>
+                  {/* Items as chips */}
+                  <div className="flex flex-wrap gap-2">
+                    {col.items.map(item => (
+                      <span key={item}
+                        className="px-3 py-1 rounded-lg text-[11.5px] font-medium text-slate-400 whitespace-nowrap"
+                        style={{ background: `${col.color}0d`, border: `1px solid ${col.color}22` }}>
+                        {item}
                       </span>
-                      <span className="text-[12.5px] text-slate-400">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                    ))}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── System boot terminal ──────────────────────────────────── */}
+      <section className="relative px-5 py-28 border-t border-slate-800/30 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse 50% 80% at 50% 50%, rgba(52,211,153,0.03) 0%, transparent 70%)' }} />
+        <div className="relative max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-amber-500/60 mb-3">Under the hood</p>
+            <h2 className="font-black text-white" style={{ fontSize: 'clamp(26px,4vw,40px)', letterSpacing: '-1px' }}>
+              Everything loads. Every time.
+            </h2>
+          </div>
+          <Terminal />
         </div>
       </section>
 
