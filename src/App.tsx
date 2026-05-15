@@ -43,12 +43,30 @@ const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'recap',     label: 'Recap',     Icon: BarChart2      },
 ]
 
-// Mobile check runs synchronously before any hooks — no spinner, no auth race
 const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768
 
 export default function App() {
-  if (IS_MOBILE) return <Landing onSignIn={() => window.location.reload()} />
+  if (IS_MOBILE) return <MobileApp />
   return <DesktopApp />
+}
+
+function MobileApp() {
+  const { user, loading: authLoading, signOut } = useAuth()
+  const [wantSignIn, setWantSignIn] = useState(false)
+
+  if (authLoading) return (
+    <div className="flex items-center justify-center h-screen bg-[#05050a] gap-3">
+      <div className="w-5 h-5 border-2 border-amber-500/30 border-t-amber-400 rounded-full animate-spin" />
+    </div>
+  )
+
+  // Authenticated on mobile — show app (better than blocking them out)
+  if (user) return <AppShell signOut={SUPABASE_CONFIGURED ? signOut : undefined} userEmail={user?.email} />
+
+  // Wants to sign in
+  if (wantSignIn) return <LoginScreen />
+
+  return <Landing onSignIn={() => setWantSignIn(true)} />
 }
 
 function DesktopApp() {
