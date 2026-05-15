@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FlaskConical, ArrowRight, ExternalLink } from 'lucide-react'
+import { FlaskConical, ArrowRight, ExternalLink, Check } from 'lucide-react'
 
 const WHOP_URL = import.meta.env.VITE_WHOP_BUY_URL as string | undefined
 
@@ -9,7 +9,7 @@ interface Props {
   onLaunch?: () => void
 }
 
-// ── Decorative concept-map background ──────────────────────────────────────
+// ── Concept map ─────────────────────────────────────────────────────────────
 const MAP_NODES = [
   { x: 600, y: 300, r: 22, label: 'Liquidity',       color: '#34d399' },
   { x: 350, y: 200, r: 18, label: 'Market Structure', color: '#34d399' },
@@ -49,28 +49,22 @@ const MAP_EDGES = [
   [12,17],[13,18],
 ]
 
-function ConceptMapBg({ opacity = 0.07 }: { opacity?: number }) {
+function ConceptMapBg({ opacity = 0.09 }: { opacity?: number }) {
   return (
-    <svg
-      viewBox="0 0 1100 680"
-      className="absolute inset-0 w-full h-full"
-      preserveAspectRatio="xMidYMid slice"
-      style={{ opacity }}
-      aria-hidden
-    >
+    <svg viewBox="0 0 1100 680" className="absolute inset-0 w-full h-full"
+      preserveAspectRatio="xMidYMid slice" style={{ opacity }} aria-hidden>
       {MAP_EDGES.map(([a, b], i) => {
         const na = MAP_NODES[a], nb = MAP_NODES[b]
-        return (
-          <line key={i}
-            x1={na.x} y1={na.y} x2={nb.x} y2={nb.y}
-            stroke="rgba(255,255,255,0.45)" strokeWidth="1"
-          />
-        )
+        return <line key={i} x1={na.x} y1={na.y} x2={nb.x} y2={nb.y}
+          stroke="rgba(255,255,255,0.5)" strokeWidth="1" />
       })}
       {MAP_NODES.map((n, i) => (
         <g key={i}>
-          <circle cx={n.x} cy={n.y} r={n.r} fill={n.color} fillOpacity="0.3" stroke={n.color} strokeWidth="1.5" strokeOpacity="0.7" />
-          <text x={n.x} y={n.y + n.r + 11} textAnchor="middle" fill="white" fontSize="9" fontFamily="system-ui" fontWeight="600" fillOpacity="0.75">
+          <circle cx={n.x} cy={n.y} r={n.r + 6} fill={n.color} fillOpacity="0.06" />
+          <circle cx={n.x} cy={n.y} r={n.r} fill={n.color} fillOpacity="0.3"
+            stroke={n.color} strokeWidth="1.5" strokeOpacity="0.8" />
+          <text x={n.x} y={n.y + n.r + 12} textAnchor="middle" fill="white"
+            fontSize="9" fontFamily="system-ui" fontWeight="600" fillOpacity="0.8">
             {n.label}
           </text>
         </g>
@@ -79,52 +73,57 @@ function ConceptMapBg({ opacity = 0.07 }: { opacity?: number }) {
   )
 }
 
-// ── Concept pill strip ──────────────────────────────────────────────────────
-const CONCEPT_PILLS = [
-  { label: 'Market Structure', color: '#34d399' },
-  { label: 'Liquidity',        color: '#34d399' },
-  { label: 'FVG',              color: '#34d399' },
-  { label: 'Order Block',      color: '#60a5fa' },
-  { label: 'AMD Cycle',        color: '#c084fc' },
-  { label: 'Kill Zones',       color: '#c084fc' },
-  { label: 'Displacement',     color: '#60a5fa' },
-  { label: 'OTE',              color: '#f59e0b' },
-  { label: 'Premium/Discount', color: '#60a5fa' },
-  { label: 'Inducement',       color: '#60a5fa' },
-  { label: 'Breaker Block',    color: '#60a5fa' },
-  { label: 'DOL',              color: '#f59e0b' },
-  { label: 'MTFA',             color: '#c084fc' },
-  { label: 'EQH / EQL',        color: '#34d399' },
-  { label: 'Swing H&L',        color: '#34d399' },
-  { label: 'NWOG',             color: '#f59e0b' },
-  { label: 'Mitigation',       color: '#60a5fa' },
-  { label: 'PDH / PDL',        color: '#34d399' },
-]
-
-// ── Tool cards ──────────────────────────────────────────────────────────────
+// ── Data ─────────────────────────────────────────────────────────────────────
 const TOOLS = [
-  { emoji: '🏗️', name: 'Strategy Builder',  desc: 'Stack ICT/SMC concepts into a personal trading system. Synergies light up in real time.',  color: '#f59e0b' },
-  { emoji: '📈', name: 'Live Chart',         desc: 'Full TradingView integration with a concept-specific drawing guide.',                        color: '#60a5fa' },
-  { emoji: '🧠', name: 'Synergy Map',        desc: 'Interactive network of 50+ concepts. Hover any node to see how setups connect.',            color: '#c084fc' },
-  { emoji: '📓', name: 'Trade Journal',      desc: 'Log trades, track win rate and points. Spot patterns in your performance over time.',       color: '#34d399' },
-  { emoji: '📅', name: 'Session Planner',    desc: 'Build plans around kill zones, macros, and FOMC. Never get blindsided by news.',            color: '#fb923c' },
-  { emoji: '📊', name: 'Trade Recap',        desc: 'Upload any broker CSV. Get stunning visual trade cards, montages, and video exports.',      color: '#f472b6' },
+  { emoji: '🏗️', name: 'Strategy Builder',  desc: 'Stack ICT/SMC concepts into a living trading system. Synergies light up in real time.',   color: '#f59e0b' },
+  { emoji: '📈', name: 'Live Chart',         desc: 'Full TradingView integration with a concept-specific drawing guide overlay.',              color: '#60a5fa' },
+  { emoji: '🧠', name: 'Synergy Map',        desc: 'Interactive network of 50+ concepts. Hover any node to see how setups connect.',           color: '#c084fc' },
+  { emoji: '📓', name: 'Trade Journal',      desc: 'Log trades, track win rate and R. Spot patterns in your performance over time.',           color: '#34d399' },
+  { emoji: '📅', name: 'Session Planner',    desc: 'Plan around kill zones, macros, and FOMC. Never get caught off-guard by a news candle.',  color: '#fb923c' },
+  { emoji: '📊', name: 'Trade Recap',        desc: 'Upload any broker CSV. Get trade cards, weekly montages, and one-click video exports.',   color: '#f472b6' },
 ]
 
-// ── Component ───────────────────────────────────────────────────────────────
+const FEATURE_COLS = [
+  {
+    heading: 'Edge-building',
+    color: '#f59e0b',
+    items: ['50+ ICT / SMC concepts mapped', 'Real-time synergy detection', 'Concept dependency graph', 'Mastery quiz system', 'Strategy template library'],
+  },
+  {
+    heading: 'Execution',
+    color: '#60a5fa',
+    items: ['Kill zone & macro clock', 'Live TradingView chart', 'Pre-market session notes', 'Daily & weekly planning', 'Trading rules checklist'],
+  },
+  {
+    heading: 'Review',
+    color: '#34d399',
+    items: ['Trade journal w/ R-multiples', 'Win rate & streak tracking', 'CSV broker import', 'Visual trade-card recap', 'Video montage export'],
+  },
+]
+
+const STEPS = [
+  { n: '01', title: 'Get Your License', body: 'Buy on Whop. Your license key is tied to your account — one price, access forever, syncs everywhere.' },
+  { n: '02', title: 'Build Your System', body: 'Open the Strategy Builder. Stack your ICT concepts, watch synergies light up, and lock in your playbook.' },
+  { n: '03', title: 'Execute & Review', body: 'Trade with a plan. Log in the journal. Recap every week with visual trade cards and automatic montages.' },
+]
+
+// ── Component ─────────────────────────────────────────────────────────────────
 export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
   const [visible, setVisible] = useState(false)
   useEffect(() => { const t = setTimeout(() => setVisible(true), 40); return () => clearTimeout(t) }, [])
 
   const anim = (delay: number) => ({
     className: `transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`,
-    style:     { transitionDelay: `${delay}ms` },
+    style: { transitionDelay: `${delay}ms` },
   })
+
+  const handleCTA = isAuthenticated ? onLaunch : onSignIn
+  const ctaLabel  = isAuthenticated ? 'Launch Trading Lab' : 'Sign In with License Key'
 
   return (
     <div className="min-h-screen bg-[#05050a] text-white overflow-x-hidden">
 
-      {/* ── Sticky nav ───────────────────────────────────────────── */}
+      {/* ── Nav ───────────────────────────────────────────────────── */}
       <nav className="fixed top-0 inset-x-0 z-50 border-b border-slate-800/50 bg-[#05050a]/85 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -132,9 +131,8 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
               <FlaskConical size={13} className="text-amber-400" />
             </div>
             <span className="text-[13px] font-black tracking-widest text-white">TRADING LAB</span>
-            <span className="hidden sm:block text-[10px] text-slate-700 font-bold tracking-[0.15em] uppercase ml-1">by Chronic Trading</span>
+            <span className="hidden sm:block text-[10px] text-slate-700 font-bold tracking-[0.15em] uppercase ml-1">a Chronic Trading tool</span>
           </div>
-
           <div className="flex items-center gap-3">
             {WHOP_URL && !isAuthenticated && (
               <a href={WHOP_URL} target="_blank" rel="noopener noreferrer"
@@ -158,115 +156,116 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
         </div>
       </nav>
 
-      {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-14 pb-24 px-6 text-center overflow-hidden">
-
-        {/* Concept map background */}
-        <ConceptMapBg opacity={0.09} />
-
-        {/* Radial fade overlay */}
+      {/* ── Hero ──────────────────────────────────────────────────── */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center pt-14 pb-28 px-6 text-center overflow-hidden">
+        <ConceptMapBg opacity={0.14} />
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 75% 65% at 50% 50%, transparent 0%, #05050a 72%)' }} />
-
-        {/* Amber glow */}
+          style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 50%, transparent 0%, #05050a 70%)' }} />
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 55% 55% at 50% 45%, rgba(245,158,11,0.07) 0%, transparent 70%)' }} />
-
-        {/* Top border line */}
+          style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 40%, rgba(245,158,11,0.08) 0%, transparent 70%)' }} />
         <div className="absolute top-14 inset-x-0 h-px pointer-events-none"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.3), transparent)' }} />
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.35), transparent)' }} />
 
-        <div className="relative z-10 max-w-4xl mx-auto w-full">
+        <div className="relative z-10 max-w-4xl mx-auto w-full flex flex-col items-center">
 
-          {/* Badge */}
           <div {...anim(0)} className={`${anim(0).className} mb-8`} style={anim(0).style}>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-amber-500/20 bg-amber-500/6">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" style={{ boxShadow: '0 0 6px #f59e0b' }} />
-              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-amber-400/80">Chronic Trading</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" style={{ boxShadow: '0 0 8px #f59e0b' }} />
+              <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-amber-400/80">a Chronic Trading tool</span>
             </div>
           </div>
 
-          {/* Headline */}
-          <div {...anim(80)} className={`${anim(80).className} mb-6`} style={anim(80).style}>
-            <h1 className="font-black leading-[0.88] tracking-tight select-none" style={{ fontSize: 'clamp(54px, 10.5vw, 94px)', letterSpacing: '-3px' }}>
+          <div {...anim(80)} className={`${anim(80).className} mb-6 w-full`} style={anim(80).style}>
+            <h1 className="font-black leading-[0.88] tracking-tight select-none text-center"
+              style={{ fontSize: 'clamp(52px, 10vw, 92px)', letterSpacing: '-3px' }}>
               <span className="text-white">The Professional</span><br />
               <span style={{
-                background: 'linear-gradient(125deg, #fbbf24 0%, #f59e0b 35%, #fef3c7 65%, #f59e0b 100%)',
+                background: 'linear-gradient(125deg, #fbbf24 0%, #f59e0b 35%, #fef3c7 60%, #f59e0b 100%)',
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-              }}>
-                Trading System.
-              </span>
+              }}>Trading System.</span>
             </h1>
           </div>
 
-          {/* Sub */}
           <div {...anim(160)} className={`${anim(160).className} mb-10`} style={anim(160).style}>
-            <p className="text-slate-400 max-w-xl mx-auto leading-relaxed" style={{ fontSize: 'clamp(15px, 2vw, 18px)' }}>
+            <p className="text-slate-400 max-w-xl mx-auto leading-relaxed text-center"
+              style={{ fontSize: 'clamp(15px, 2vw, 18px)' }}>
               Nine precision-built tools for ICT, SMC, and futures traders.<br className="hidden sm:block" />
               Build your system. Journal your edge. Recap every week.
             </p>
           </div>
 
-          {/* CTAs */}
-          <div {...anim(240)} className={`${anim(240).className} flex flex-col sm:flex-row items-center justify-center gap-3 mb-16`} style={anim(240).style}>
-            {isAuthenticated ? (
-              <button onClick={onLaunch}
-                className="group flex items-center gap-3 px-9 py-4 rounded-2xl font-bold text-[15px] transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-                style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#0a0800', boxShadow: '0 0 50px rgba(245,158,11,0.22), 0 4px 20px rgba(245,158,11,0.14)' }}>
-                Launch Trading Lab
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-            ) : (
-              <>
-                <button onClick={onSignIn}
-                  className="group flex items-center gap-3 px-9 py-4 rounded-2xl font-bold text-[15px] transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-                  style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#0a0800', boxShadow: '0 0 50px rgba(245,158,11,0.22), 0 4px 20px rgba(245,158,11,0.14)' }}>
-                  Sign In with License Key
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-                {WHOP_URL && (
-                  <a href={WHOP_URL} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-7 py-4 rounded-2xl font-semibold text-[14px] border border-slate-700/60 text-slate-400 hover:border-slate-600 hover:text-white hover:bg-slate-800/30 transition-all">
-                    Get Access on Whop <ExternalLink size={13} />
-                  </a>
-                )}
-              </>
+          <div {...anim(240)} className={`${anim(240).className} flex flex-col sm:flex-row items-center justify-center gap-3 mb-20`} style={anim(240).style}>
+            <button onClick={handleCTA}
+              className="group flex items-center gap-3 px-10 py-4 rounded-2xl font-bold text-[15px] transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#0a0800', boxShadow: '0 0 60px rgba(245,158,11,0.25), 0 4px 20px rgba(245,158,11,0.15)' }}>
+              {ctaLabel}
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+            {WHOP_URL && !isAuthenticated && (
+              <a href={WHOP_URL} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 px-7 py-4 rounded-2xl font-semibold text-[14px] border border-slate-700/60 text-slate-400 hover:border-slate-600 hover:text-white hover:bg-slate-800/30 transition-all">
+                Get Access on Whop <ExternalLink size={13} />
+              </a>
             )}
           </div>
 
-          {/* Stats */}
-          <div {...anim(320)} className={`${anim(320).className} flex items-center justify-center gap-0`} style={anim(320).style}>
+          {/* Stats — spaced with large gaps */}
+          <div {...anim(320)} className={`${anim(320).className} flex items-center justify-center`} style={anim(320).style}>
             {[
               { val: '50+', sub: 'ICT Concepts' },
               { val: '9',   sub: 'Pro Tools'    },
               { val: '1',   sub: 'Platform'     },
             ].map((s, i) => (
               <div key={s.sub} className="flex items-stretch">
-                {i > 0 && <div className="w-px bg-slate-800 mx-8 md:mx-12 self-stretch" />}
+                {i > 0 && <div className="w-px bg-slate-800/80 self-stretch mx-14 md:mx-20" />}
                 <div className="text-center">
-                  <p className="font-black text-white leading-none" style={{ fontSize: 'clamp(26px,5vw,38px)', fontFamily: "'JetBrains Mono',monospace" }}>{s.val}</p>
-                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] mt-1.5">{s.sub}</p>
+                  <p className="font-black text-white leading-none"
+                    style={{ fontSize: 'clamp(30px,5.5vw,44px)', fontFamily: "'JetBrains Mono',monospace",
+                      textShadow: '0 0 30px rgba(245,158,11,0.3)' }}>{s.val}</p>
+                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.22em] mt-2">{s.sub}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Scroll cue */}
-        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-opacity duration-1000 ${visible ? 'opacity-20' : 'opacity-0'}`}
+        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 transition-opacity duration-1000 ${visible ? 'opacity-15' : 'opacity-0'}`}
           style={{ transitionDelay: '900ms' }}>
-          <div className="w-px h-10 bg-gradient-to-b from-slate-500 to-transparent animate-pulse" />
+          <div className="w-px h-12 bg-gradient-to-b from-slate-500 to-transparent animate-pulse mx-auto" />
         </div>
       </section>
 
-      {/* ── Concept pill strip ───────────────────────────────────── */}
-      <div className="relative border-y border-slate-800/40 overflow-hidden py-5"
-        style={{ background: 'linear-gradient(90deg, #05050a 0%, rgba(245,158,11,0.025) 50%, #05050a 100%)' }}>
-        <div className="flex items-center gap-3 px-6 flex-wrap justify-center max-w-5xl mx-auto">
-          {CONCEPT_PILLS.map(p => (
+      {/* ── Concept marquee strip ─────────────────────────────────── */}
+      <div className="relative border-y border-slate-800/50 py-5 overflow-hidden"
+        style={{ background: 'linear-gradient(90deg,#05050a 0%,rgba(245,158,11,0.025) 50%,#05050a 100%)' }}>
+        <div className="absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(90deg,#05050a,transparent)' }} />
+        <div className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(270deg,#05050a,transparent)' }} />
+        <div className="flex items-center gap-3 px-8 flex-wrap justify-center">
+          {[
+            { label: 'Market Structure', color: '#34d399' },
+            { label: 'Liquidity',        color: '#34d399' },
+            { label: 'FVG',              color: '#34d399' },
+            { label: 'Order Block',      color: '#60a5fa' },
+            { label: 'AMD Cycle',        color: '#c084fc' },
+            { label: 'Kill Zones',       color: '#c084fc' },
+            { label: 'Displacement',     color: '#60a5fa' },
+            { label: 'OTE',              color: '#f59e0b' },
+            { label: 'Premium/Discount', color: '#60a5fa' },
+            { label: 'Inducement',       color: '#60a5fa' },
+            { label: 'Breaker Block',    color: '#60a5fa' },
+            { label: 'DOL',              color: '#f59e0b' },
+            { label: 'MTFA',             color: '#c084fc' },
+            { label: 'EQH / EQL',        color: '#34d399' },
+            { label: 'NWOG',             color: '#f59e0b' },
+            { label: 'Mitigation',       color: '#60a5fa' },
+            { label: 'PDH / PDL',        color: '#34d399' },
+            { label: 'Swing H&L',        color: '#34d399' },
+          ].map(p => (
             <span key={p.label}
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-semibold tracking-[0.08em] uppercase whitespace-nowrap"
-              style={{ color: p.color, background: `${p.color}10`, border: `1px solid ${p.color}25` }}>
+              style={{ color: p.color, background: `${p.color}12`, border: `1px solid ${p.color}28` }}>
               <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: p.color, opacity: 0.7 }} />
               {p.label}
             </span>
@@ -274,15 +273,48 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
         </div>
       </div>
 
-      {/* ── Tools ────────────────────────────────────────────────── */}
+      {/* ── How It Works ──────────────────────────────────────────── */}
       <section className="px-6 py-28">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
+            <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-amber-500/60 mb-3">The process</p>
+            <h2 className="font-black text-white" style={{ fontSize: 'clamp(26px,4vw,38px)', letterSpacing: '-1px' }}>
+              From setup to edge in three steps.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {STEPS.map((s, i) => (
+              <div key={s.n} className="relative group rounded-2xl p-7 overflow-hidden"
+                style={{ background: 'rgba(7,7,14,0.98)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="absolute top-0 inset-x-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{ background: 'linear-gradient(90deg,transparent,rgba(245,158,11,0.5),transparent)' }} />
+                {i < STEPS.length - 1 && (
+                  <div className="hidden md:block absolute top-1/2 -right-3 w-6 h-px bg-slate-700/60 z-10" />
+                )}
+                <p className="font-black leading-none mb-5"
+                  style={{ fontSize: '42px', fontFamily: "'JetBrains Mono',monospace",
+                    background: 'linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.05))',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                  {s.n}
+                </p>
+                <h3 className="text-[15px] font-bold text-white mb-3">{s.title}</h3>
+                <p className="text-[12.5px] text-slate-500 leading-relaxed">{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Tools ─────────────────────────────────────────────────── */}
+      <section className="px-6 pb-28">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
             <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-amber-500/60 mb-3">What's inside</p>
-            <h2 className="font-black text-white mb-4" style={{ fontSize: 'clamp(28px,4vw,42px)', letterSpacing: '-1px' }}>
+            <h2 className="font-black text-white mb-4" style={{ fontSize: 'clamp(26px,4vw,40px)', letterSpacing: '-1px' }}>
               Every tool you need. Nothing you don't.
             </h2>
-            <p className="text-[14px] text-slate-500 max-w-md mx-auto">
+            <p className="text-[14px] text-slate-500 max-w-sm mx-auto">
               Nine precision-built tools in one dark, focused platform.
             </p>
           </div>
@@ -291,23 +323,17 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
             {TOOLS.map(t => (
               <div key={t.name}
                 className="group relative rounded-2xl p-6 overflow-hidden transition-all duration-300 cursor-default hover:-translate-y-1.5"
-                style={{ background: 'rgba(7,7,14,0.98)', border: `1px solid rgba(255,255,255,0.06)` }}>
-
-                {/* Hover top glow line */}
-                <div className="absolute top-0 inset-x-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `linear-gradient(90deg, transparent 0%, ${t.color}80 50%, transparent 100%)` }} />
-
-                {/* Hover fill glow */}
+                style={{ background: 'rgba(6,6,12,0.98)', border: `1px solid rgba(255,255,255,0.055)` }}>
+                <div className="absolute top-0 inset-x-0 h-[2px] rounded-t-2xl opacity-40 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{ background: `linear-gradient(90deg, transparent 0%, ${t.color} 50%, transparent 100%)` }} />
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${t.color}08, transparent 70%)` }} />
-
-                <span className="text-[30px] mb-4 block">{t.emoji}</span>
+                  style={{ background: `radial-gradient(ellipse 90% 55% at 50% 0%, ${t.color}0a, transparent 70%)` }} />
+                <span className="text-[32px] mb-4 block leading-none transition-transform duration-300 group-hover:scale-110 origin-left">{t.emoji}</span>
                 <h3 className="text-[14px] font-bold text-white mb-2">{t.name}</h3>
                 <p className="text-[12.5px] text-slate-500 leading-relaxed">{t.desc}</p>
-
                 <div className="mt-5 flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: t.color, opacity: 0.6 }} />
-                  <div className="h-px flex-1 max-w-[48px]" style={{ background: `linear-gradient(90deg, ${t.color}50, transparent)` }} />
+                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: t.color, opacity: 0.7 }} />
+                  <div className="h-px flex-1 max-w-[56px]" style={{ background: `linear-gradient(90deg,${t.color}55,transparent)` }} />
                 </div>
               </div>
             ))}
@@ -315,82 +341,107 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
         </div>
       </section>
 
-      {/* ── Bottom CTA ───────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-t border-slate-800/50" style={{ minHeight: '520px' }}>
-
-        {/* Concept map — rendered directly at target opacity (no wrapper div) */}
-        <ConceptMapBg opacity={0.13} />
-
-        {/* Strong radial fade so edges darken, center stays readable */}
+      {/* ── Feature checklist ─────────────────────────────────────── */}
+      <section className="relative px-6 py-28 border-t border-slate-800/40 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 65% 70% at 50% 50%, transparent 20%, #05050a 80%)' }} />
+          style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 50%, rgba(245,158,11,0.04) 0%, transparent 70%)' }} />
+        <div className="relative max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-amber-500/60 mb-3">Everything included</p>
+            <h2 className="font-black text-white" style={{ fontSize: 'clamp(26px,4vw,40px)', letterSpacing: '-1px' }}>
+              Built for the serious trader.
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {FEATURE_COLS.map(col => (
+              <div key={col.heading} className="flex flex-col items-center md:items-start text-center md:text-left">
+                <div className="inline-flex items-center gap-2 mb-6">
+                  <div className="w-1.5 h-5 rounded-full" style={{ background: col.color, opacity: 0.7 }} />
+                  <p className="text-[12px] font-bold tracking-[0.18em] uppercase" style={{ color: col.color }}>{col.heading}</p>
+                </div>
+                <ul className="space-y-3 w-full">
+                  {col.items.map(item => (
+                    <li key={item} className="flex items-center gap-3 justify-center md:justify-start">
+                      <span className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
+                        style={{ background: `${col.color}18`, border: `1px solid ${col.color}35` }}>
+                        <Check size={9} style={{ color: col.color }} />
+                      </span>
+                      <span className="text-[12.5px] text-slate-400">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-        {/* Amber bloom from bottom */}
+      {/* ── Bottom CTA ────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden border-t border-slate-800/50" style={{ minHeight: '560px' }}>
+        <ConceptMapBg opacity={0.15} />
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 100%, rgba(245,158,11,0.09) 0%, transparent 65%)' }} />
-
-        {/* Top amber accent line */}
+          style={{ background: 'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 15%, #05050a 78%)' }} />
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse 90% 55% at 50% 100%, rgba(245,158,11,0.10) 0%, transparent 65%)' }} />
         <div className="absolute top-0 inset-x-0 h-px"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.4), transparent)' }} />
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.45), transparent)' }} />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6 py-28 text-center flex flex-col items-center">
+        <div className="relative z-10 max-w-3xl mx-auto px-6 py-32 flex flex-col items-center text-center">
 
-          <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-amber-500/70 mb-7">
-            {isAuthenticated ? "You're In" : 'Get Started'}
+          <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-amber-500/70 mb-8">
+            {isAuthenticated ? "You're In" : 'Get Started Today'}
           </p>
 
-          <h2 className="font-black text-white mb-6 w-full"
-            style={{ fontSize: 'clamp(40px, 7vw, 72px)', lineHeight: 0.92, letterSpacing: '-3px' }}>
-            {isAuthenticated
-              ? <>Your lab<br /><span style={{ background: 'linear-gradient(125deg,#fbbf24,#f59e0b 40%,#fde68a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>is waiting.</span></>
-              : <>Trade smarter.<br /><span style={{ background: 'linear-gradient(125deg,#fbbf24,#f59e0b 40%,#fde68a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Starting now.</span></>
-            }
+          <h2 className="font-black text-white mb-8 w-full"
+            style={{ fontSize: 'clamp(44px, 8vw, 80px)', lineHeight: 0.9, letterSpacing: '-3px' }}>
+            {isAuthenticated ? (
+              <>Your lab<br />
+              <span style={{ background: 'linear-gradient(125deg,#fbbf24,#f59e0b 40%,#fde68a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>is waiting.</span></>
+            ) : (
+              <>Trade smarter.<br />
+              <span style={{ background: 'linear-gradient(125deg,#fbbf24,#f59e0b 40%,#fde68a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Starting now.</span></>
+            )}
           </h2>
 
-          <p className="text-[15px] text-slate-400 max-w-xs mx-auto mb-12 leading-relaxed">
+          <p className="text-[15px] text-slate-400 max-w-xs mx-auto mb-14 leading-relaxed">
             {isAuthenticated
-              ? 'Jump back in. Your builds, journal, and plans are ready.'
-              : 'One license. Every tool. Sync across all your devices.'}
+              ? 'Jump back in. Your builds, journal, and plans are waiting.'
+              : 'One license. Every tool. Sync across all your devices forever.'}
           </p>
 
-          {isAuthenticated ? (
-            <button onClick={onLaunch}
-              className="inline-flex items-center gap-3 px-12 py-5 rounded-2xl font-bold text-[16px] transition-all hover:scale-[1.03] active:scale-[0.97]"
-              style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#0a0800', boxShadow: '0 0 80px rgba(245,158,11,0.25), 0 8px 32px rgba(245,158,11,0.14)' }}>
-              Launch Trading Lab <ArrowRight size={18} />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+            <button onClick={handleCTA}
+              className="group flex items-center gap-3 rounded-2xl font-bold text-[16px] transition-all hover:scale-[1.03] active:scale-[0.97]"
+              style={{ padding: '1.1rem 3rem', background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#0a0800',
+                boxShadow: '0 0 80px rgba(245,158,11,0.28), 0 8px 32px rgba(245,158,11,0.16)' }}>
+              {ctaLabel}
+              <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
             </button>
-          ) : (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
-              <button onClick={onSignIn}
-                className="flex items-center gap-3 px-10 py-4.5 rounded-2xl font-bold text-[15px] transition-all hover:scale-[1.03] active:scale-[0.97]"
-                style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#0a0800', boxShadow: '0 0 60px rgba(245,158,11,0.22), 0 6px 28px rgba(245,158,11,0.12)', padding: '1rem 2.5rem' }}>
-                Sign In <ArrowRight size={16} />
-              </button>
-              {WHOP_URL && (
-                <a href={WHOP_URL} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-2xl font-semibold text-[14px] border border-slate-700/60 text-slate-400 hover:border-amber-500/35 hover:text-amber-300 hover:bg-amber-500/5 transition-all"
-                  style={{ padding: '1rem 2rem' }}>
-                  Get Access on Whop <ExternalLink size={13} />
-                </a>
-              )}
-            </div>
-          )}
+            {WHOP_URL && !isAuthenticated && (
+              <a href={WHOP_URL} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-2xl font-semibold text-[14px] border border-slate-700/60 text-slate-400 hover:border-amber-500/35 hover:text-amber-300 hover:bg-amber-500/5 transition-all"
+                style={{ padding: '1.1rem 2.2rem' }}>
+                Get Access on Whop <ExternalLink size={13} />
+              </a>
+            )}
+          </div>
 
-          {/* Bottom tagline */}
-          <p className="mt-14 text-[11px] text-slate-700 tracking-[0.2em] uppercase font-semibold">
+          <p className="mt-16 text-[11px] text-slate-700 tracking-[0.22em] uppercase font-semibold">
             ICT · SMC · Futures · One Platform
           </p>
         </div>
       </section>
 
-      {/* ── Footer ───────────────────────────────────────────────── */}
+      {/* ── Footer ────────────────────────────────────────────────── */}
       <footer className="border-t border-slate-800/30 px-6 py-8">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <FlaskConical size={12} className="text-amber-500/40" />
             <span className="text-[11px] font-black tracking-widest text-slate-700 uppercase">Trading Lab</span>
+            <span className="text-[10px] text-slate-800 mx-1">·</span>
+            <span className="text-[10px] text-slate-800 tracking-[0.12em] uppercase">a Chronic Trading tool</span>
           </div>
-          <p className="text-[11px] text-slate-800 tracking-[0.15em] uppercase">ICT · SMC · Futures · by Chronic Trading</p>
+          <p className="text-[11px] text-slate-800 tracking-[0.15em] uppercase">ICT · SMC · Futures</p>
         </div>
       </footer>
     </div>
