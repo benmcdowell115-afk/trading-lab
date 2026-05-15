@@ -158,9 +158,9 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-14 pb-28 px-6 text-center overflow-hidden">
-        <ConceptMapBg opacity={0.14} />
+        <ConceptMapBg opacity={0.22} />
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 50%, transparent 0%, #05050a 70%)' }} />
+          style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 20%, #05050a 85%)' }} />
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 40%, rgba(245,158,11,0.08) 0%, transparent 70%)' }} />
         <div className="absolute top-14 inset-x-0 h-px pointer-events-none"
@@ -378,9 +378,9 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
 
       {/* ── Bottom CTA ────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-t border-slate-800/50" style={{ minHeight: '560px' }}>
-        <ConceptMapBg opacity={0.15} />
+        <ConceptMapBg opacity={0.22} />
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 15%, #05050a 78%)' }} />
+          style={{ background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 20%, #05050a 85%)' }} />
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse 90% 55% at 50% 100%, rgba(245,158,11,0.10) 0%, transparent 65%)' }} />
         <div className="absolute top-0 inset-x-0 h-px"
