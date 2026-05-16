@@ -3,6 +3,7 @@ import {
   FlaskConical, Package, Beaker, Network,
   LayoutTemplate, BookOpen, LineChart, StickyNote,
   Shield, ClipboardCheck, Brain, CalendarDays, Settings, LogOut, BarChart2, Building2,
+  ShieldAlert, Smile,
 } from 'lucide-react'
 import { Landing }        from './pages/Landing'
 import { Builder }        from './pages/Builder'
@@ -20,6 +21,8 @@ import { SessionNotes }   from './components/SessionNotes'
 import { TradingRules }   from './components/TradingRules'
 import { QuizModal }      from './components/QuizModal'
 import { SettingsModal }  from './components/SettingsModal'
+import { DrawdownGuard }  from './components/DrawdownGuard'
+import { MindsetCheck }   from './components/MindsetCheck'
 import { LoginScreen }    from './components/LoginScreen'
 import { useBuilds }      from './hooks/useBuilds'
 import { useAuth }        from './hooks/useAuth'
@@ -106,11 +109,13 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
   const [tab,          setTab]          = useState<Tab>('builder')
   const mainRef = useRef<HTMLElement>(null)
   const [loadedBuild,  setLoadedBuild]  = useState<Build | null>(null)
-  const [notesOpen,    setNotesOpen]    = useState(false)
-  const [rulesOpen,    setRulesOpen]    = useState(false)
-  const [quizOpen,     setQuizOpen]     = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const [propsOpen,    setPropsOpen]    = useState(false)
+  const [notesOpen,     setNotesOpen]     = useState(false)
+  const [rulesOpen,     setRulesOpen]     = useState(false)
+  const [quizOpen,      setQuizOpen]      = useState(false)
+  const [settingsOpen,  setSettingsOpen]  = useState(false)
+  const [propsOpen,     setPropsOpen]     = useState(false)
+  const [drawdownOpen,  setDrawdownOpen]  = useState(false)
+  const [mindsetOpen,   setMindsetOpen]   = useState(false)
   const { loadSharedBuild }             = useBuilds()
 
   useEffect(() => {
@@ -155,6 +160,12 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
             <KillZoneClock />
           </div>
           <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0">
+            <button onClick={() => setDrawdownOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/8 transition-all">
+              <ShieldAlert size={13} /><span className="hidden lg:inline">Guard</span>
+            </button>
+            <button onClick={() => setMindsetOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-violet-500/40 hover:text-violet-400 hover:bg-violet-500/8 transition-all">
+              <Smile size={13} /><span className="hidden lg:inline">Mindset</span>
+            </button>
             <button onClick={() => setPropsOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all">
               <Building2 size={13} /><span className="hidden lg:inline">Props</span>
             </button>
@@ -206,6 +217,8 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
       <TradingRules  open={rulesOpen}    onClose={() => setRulesOpen(false)} />
       <QuizModal     open={quizOpen}     onClose={() => setQuizOpen(false)} />
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <DrawdownGuard open={drawdownOpen} onClose={() => setDrawdownOpen(false)} />
+      <MindsetCheck  open={mindsetOpen}  onClose={() => setMindsetOpen(false)} />
 
       {/* Prop Firms modal */}
       {propsOpen && (
