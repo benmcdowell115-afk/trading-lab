@@ -92,7 +92,9 @@ const TOOLS = [
   { emoji: '📓', name: 'Trade Journal',      desc: 'Log trades with R-multiples, win rate, and streak tracking. Find the patterns in your performance over time.', color: '#34d399', tag: 'Track' },
   { emoji: '📅', name: 'Session Planner',    desc: 'Plan kill zones, macros, and FOMC like a pro. Never get caught off-guard by a news candle or session transition.', color: '#fb923c', tag: 'Plan' },
   { emoji: '📊', name: 'Trade Recap',        desc: 'Upload any broker CSV and get stunning visual trade cards, weekly montages, and one-click video export.', color: '#f472b6', tag: 'Review'   },
-  { emoji: '🏦', name: 'Prop Firm Compare', desc: '9 futures prop firms scored and ranked. Filter by EOD drawdown, news trading, live accounts, and more.',   color: '#34d399', tag: 'Research' },
+  { emoji: '🏦', name: 'Prop Firm Compare',  desc: '9 futures prop firms scored and ranked. Filter by EOD drawdown, news trading, live accounts, and more.',   color: '#34d399', tag: 'Research' },
+  { emoji: '🛡️', name: 'Drawdown Guard',     desc: 'Set your daily loss limit and profit target. A live danger meter turns red as you approach your max — so you stop before you blow the account.', color: '#f97316', tag: 'Protect' },
+  { emoji: '🧘', name: 'Mindset Check',      desc: 'Rate your emotional state before the session and log a note. Track how your mindset correlates with your trading results over time.', color: '#a78bfa', tag: 'Focus' },
 ]
 
 const STEPS = [
@@ -110,7 +112,7 @@ const FEATURE_COLS = [
   {
     heading: 'Execution',
     color: '#60a5fa',
-    items: ['Kill zone & macro clock', 'Live TradingView chart embed', 'Pre-market session notes', 'Daily & weekly planning tools', 'Trading rules checklist'],
+    items: ['Kill zone & macro clock', 'Live TradingView chart embed', 'Pre-market session notes', 'Daily & weekly planning tools', 'Trading rules checklist', 'Drawdown guard & daily limits', 'Mindset check-in tracker'],
   },
   {
     heading: 'Review',
@@ -152,6 +154,8 @@ const BOOT_LINES = [
   { text: '▸  trade journal + analytics ........  LOADED', type: 'item'    },
   { text: '▸  synergy detection engine .........  LOADED', type: 'item'    },
   { text: '▸  recap + video export engine ......  LOADED', type: 'item'    },
+  { text: '▸  drawdown guard ...................  LOADED', type: 'item'    },
+  { text: '▸  mindset check-in tracker .........  LOADED', type: 'item'    },
   { text: '─────────────────────────────────────────────', type: 'divider' },
   { text: '✓  ALL SYSTEMS ONLINE — YOUR EDGE IS LIVE',    type: 'success'  },
 ]
@@ -423,7 +427,7 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
           <div {...anim(200)} className={`${anim(200).className} mb-11`} style={anim(200).style}>
             <p className="text-slate-400 max-w-lg mx-auto leading-relaxed text-center"
               style={{ fontSize: 'clamp(15px, 2vw, 18px)' }}>
-              Ten precision-built tools for ICT and SMC traders.<br className="hidden sm:block" />
+              Twelve precision-built tools for ICT and SMC traders.<br className="hidden sm:block" />
               Build your system. Journal your edge. Recap every week.
             </p>
           </div>
@@ -448,7 +452,7 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
           <div {...anim(350)} className={`${anim(350).className} flex items-center justify-center`} style={anim(350).style}>
             {[
               { val: '50+', sub: 'ICT Concepts' },
-              { val: '10',  sub: 'Pro Tools'    },
+              { val: '12',  sub: 'Pro Tools'    },
               { val: '1',   sub: 'Platform'     },
             ].map((s, i) => (
               <div key={s.sub} className="flex items-stretch">
@@ -580,7 +584,7 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
             <h2 className="font-black text-white mb-4" style={{ fontSize: 'clamp(26px,4vw,40px)', letterSpacing: '-1px' }}>
               Every tool you need. Nothing you don't.
             </h2>
-            <p className="text-[14px] text-slate-500 max-w-sm mx-auto">Ten precision-built tools in one dark, focused platform.</p>
+            <p className="text-[14px] text-slate-500 max-w-sm mx-auto">Twelve precision-built tools in one dark, focused platform.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {TOOLS.map(t => (
@@ -617,7 +621,7 @@ export function Landing({ isAuthenticated, onSignIn, onLaunch }: Props) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
             {[
               { val: '50+', label: 'Mapped Concepts', color: '#34d399' },
-              { val: '10',  label: 'Pro Tools',        color: '#f59e0b' },
+              { val: '12',  label: 'Pro Tools',        color: '#f59e0b' },
               { val: '∞',   label: 'Synergy Links',    color: '#c084fc' },
               { val: '1',   label: 'Platform',         color: '#60a5fa' },
             ].map(s => (
