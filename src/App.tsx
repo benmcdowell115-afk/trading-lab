@@ -154,7 +154,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
           <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
             <KillZoneClock />
           </div>
-          <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 ml-auto">
+          <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 ml-auto">
             <button onClick={() => setPropsOpen(true)} className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all">
               <Building2 size={12} /><span className="hidden lg:inline">Props</span>
             </button>
