@@ -154,25 +154,26 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
           <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
             <KillZoneClock />
           </div>
-          <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 ml-auto">
-            <button onClick={() => setPropsOpen(true)} className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all">
-              <Building2 size={12} /><span className="hidden lg:inline">Props</span>
+          <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0 ml-auto">
+            {/* Props — hidden on smallest screens, shown sm+ */}
+            <button onClick={() => setPropsOpen(true)} className="hidden sm:flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all">
+              <Building2 size={13} /><span className="hidden lg:inline">Props</span>
             </button>
-            <button onClick={() => setQuizOpen(true)} className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-purple-500/40 hover:text-purple-400 hover:bg-purple-500/8 transition-all">
-              <Brain size={12} /><span className="hidden lg:inline">Quiz</span>
+            <button onClick={() => setQuizOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-purple-500/40 hover:text-purple-400 hover:bg-purple-500/8 transition-all">
+              <Brain size={13} /><span className="hidden lg:inline">Quiz</span>
             </button>
-            <button onClick={() => setRulesOpen(true)} className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all">
-              <Shield size={12} /><span className="hidden lg:inline">Rules</span>
+            <button onClick={() => setRulesOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all">
+              <Shield size={13} /><span className="hidden lg:inline">Rules</span>
             </button>
-            <button onClick={() => setNotesOpen(true)} className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-amber-500/40 hover:text-amber-400 hover:bg-amber-500/8 transition-all">
-              <StickyNote size={12} /><span className="hidden lg:inline">Notes</span>
+            <button onClick={() => setNotesOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-amber-500/40 hover:text-amber-400 hover:bg-amber-500/8 transition-all">
+              <StickyNote size={13} /><span className="hidden lg:inline">Notes</span>
             </button>
-            <button onClick={() => setSettingsOpen(true)} className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-slate-500 hover:text-slate-300 hover:bg-slate-800/40 transition-all">
-              <Settings size={12} /><span className="hidden lg:inline">Settings</span>
+            <button onClick={() => setSettingsOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-slate-500 hover:text-slate-300 hover:bg-slate-800/40 transition-all">
+              <Settings size={13} /><span className="hidden lg:inline">Settings</span>
             </button>
             {signOut && (
-              <button onClick={signOut} title={userEmail ?? 'Sign out'} className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all">
-                <LogOut size={12} /><span className="hidden lg:inline">Sign out</span>
+              <button onClick={signOut} title={userEmail ?? 'Sign out'} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all">
+                <LogOut size={13} /><span className="hidden lg:inline">Sign out</span>
               </button>
             )}
           </div>
