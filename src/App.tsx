@@ -155,8 +155,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
             <KillZoneClock />
           </div>
           <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0">
-            {/* Props — hidden on smallest screens, shown sm+ */}
-            <button onClick={() => setPropsOpen(true)} className="hidden sm:flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all">
+            <button onClick={() => setPropsOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all">
               <Building2 size={13} /><span className="hidden lg:inline">Props</span>
             </button>
             <button onClick={() => setQuizOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-purple-500/40 hover:text-purple-400 hover:bg-purple-500/8 transition-all">
