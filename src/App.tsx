@@ -30,7 +30,7 @@ const SUPABASE_CONFIGURED = !!(
   import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY
 )
 
-type Tab  = 'builder' | 'chart' | 'map' | 'plan' | 'journal' | 'calendar' | 'templates' | 'builds' | 'recap' | 'props'
+type Tab  = 'builder' | 'chart' | 'map' | 'plan' | 'journal' | 'calendar' | 'templates' | 'builds' | 'recap'
 type View = 'landing' | 'login' | 'app'
 
 const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
@@ -43,7 +43,6 @@ const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'templates', label: 'Templates', Icon: LayoutTemplate },
   { id: 'builds',    label: 'Builds',    Icon: Package        },
   { id: 'recap',     label: 'Recap',     Icon: BarChart2      },
-  { id: 'props',     label: 'Props',     Icon: Building2      },
 ]
 
 export default function App() {
@@ -111,6 +110,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
   const [rulesOpen,    setRulesOpen]    = useState(false)
   const [quizOpen,     setQuizOpen]     = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [propsOpen,    setPropsOpen]    = useState(false)
   const { loadSharedBuild }             = useBuilds()
 
   useEffect(() => {
@@ -155,6 +155,9 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
             <KillZoneClock />
           </div>
           <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 ml-auto">
+            <button onClick={() => setPropsOpen(true)} className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all">
+              <Building2 size={12} /><span className="hidden lg:inline">Props</span>
+            </button>
             <button onClick={() => setQuizOpen(true)} className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[12px] font-semibold px-2.5 md:px-3 py-1.5 md:py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-purple-500/40 hover:text-purple-400 hover:bg-purple-500/8 transition-all">
               <Brain size={12} /><span className="hidden lg:inline">Quiz</span>
             </button>
@@ -197,13 +200,32 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
         {tab === 'templates' && <Templates onLoad={handleLoadBuild} />}
         {tab === 'builds'    && <MyBuilds  onLoadBuild={handleLoadBuild} />}
         {tab === 'recap'     && <RecapPage />}
-        {tab === 'props'     && <PropFirms />}
       </main>
 
       <SessionNotes  open={notesOpen}    onClose={() => setNotesOpen(false)} />
       <TradingRules  open={rulesOpen}    onClose={() => setRulesOpen(false)} />
       <QuizModal     open={quizOpen}     onClose={() => setQuizOpen(false)} />
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+
+      {/* Prop Firms modal */}
+      {propsOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#05050a]">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800/50 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <Building2 size={14} className="text-emerald-400" />
+              <span className="text-[13px] font-bold text-white">Prop Firm Compare</span>
+            </div>
+            <button onClick={() => setPropsOpen(false)}
+              className="text-[12px] font-semibold px-3 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:text-slate-300 hover:border-slate-600 transition-all">
+              ✕ Close
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            <PropFirms />
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
