@@ -200,8 +200,8 @@ export function ConceptMap() {
                 </text>
                 {/* Fixed-size invisible hit target — prevents hover flicker when node visually grows */}
                 <circle r={NODE_R + 8} fill="transparent"
-                  onMouseEnter={() => setHovered(c.id)}
-                  onMouseLeave={() => setHovered(null)}
+                  onPointerEnter={e => { if (e.pointerType === 'mouse') setHovered(c.id) }}
+                  onPointerLeave={e => { if (e.pointerType === 'mouse') setHovered(null) }}
                   onClick={e => { e.stopPropagation(); setHovered(prev => prev === c.id ? null : c.id) }}
                 />
               </g>
