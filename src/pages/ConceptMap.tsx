@@ -98,7 +98,7 @@ export function ConceptMap() {
   const getNodeGlow   = (id: string) => colorMode === 'mastery' ? masteryGlow[masteryData[id] ?? 0]   : tierGlow[concepts.find(c => c.id === id)?.tier ?? 'basic']
 
   return (
-    <div className="flex h-full overflow-hidden bg-[#05050a] flex-col md:flex-row">
+    <div className="flex h-full overflow-hidden bg-[#05050a] flex-col md:flex-row relative">
 
       {/* ── SVG Map ── */}
       <div className="flex-1 relative overflow-hidden">
@@ -169,7 +169,7 @@ export function ConceptMap() {
             const fill      = getNodeFill(c.id)
             const stroke    = getNodeStroke(c.id)
             const glow      = getNodeGlow(c.id)
-            const showLabel = isHov || (isHighlit && !!hovered)
+
 
             return (
               <g key={c.id} transform={`translate(${p.x},${p.y})`} style={{ cursor: 'pointer' }}>
@@ -189,11 +189,11 @@ export function ConceptMap() {
                   filter={isHov ? `url(#glow-${glow})` : undefined}
                   style={{ transition: 'fill-opacity 0.15s, stroke-opacity 0.15s, stroke-width 0.15s' }}
                 />
-                {/* Label — pinned Y so it never jumps */}
+                {/* Label — always visible; dims when something else is hovered */}
                 <text y={NODE_R + 14} textAnchor="middle" fontSize="9.5"
                   fontWeight={isHov ? '700' : '500'}
                   fill={isHov ? fill : '#94a3b8'}
-                  opacity={showLabel ? 1 : 0}
+                  opacity={isHov ? 1 : (isHighlit && !!hovered) ? 0.85 : hovered ? 0.05 : 0.5}
                   fontFamily="Inter, sans-serif"
                   style={{ pointerEvents: 'none', userSelect: 'none', transition: 'opacity 0.15s' }}>
                   {c.shortName}
@@ -251,8 +251,65 @@ export function ConceptMap() {
         </div>
       </div>
 
-      {/* ── Right panel ── */}
-      <div className="w-[300px] flex-shrink-0 border-l border-slate-800/50 flex flex-col bg-[#06060d]">
+      {/* ── Mobile bottom sheet — shows when a concept is tapped ── */}
+      {activeConcept && (
+        <div className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-[#06060d] border-t border-slate-800/50 rounded-t-2xl max-h-[55vh] overflow-y-auto"
+          onClick={e => e.stopPropagation()}>
+          <div className="flex items-center justify-between px-5 pt-4 pb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getNodeFill(activeConcept.id) }} />
+              <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: colorMode === 'tier' ? tierFill[activeConcept.tier] : masteryFill[activeLevel] }}>
+                {colorMode === 'tier' ? activeConcept.tier : MASTERY_LABELS[activeLevel]}
+              </span>
+            </div>
+            <button onClick={() => setHovered(null)} className="text-slate-500 hover:text-slate-300 text-[18px] leading-none px-1">✕</button>
+          </div>
+          <div className="px-5 pb-6 space-y-3">
+            <h3 className="text-[16px] font-bold text-white">{activeConcept.name}</h3>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-0.5">
+                {[1,2,3,4,5].map(n => (
+                  <div key={n} className={`w-3 h-3 rounded-full border ${n <= activeLevel
+                    ? (activeLevel === 5 ? 'bg-amber-400 border-amber-300' : activeLevel >= 4 ? 'bg-emerald-500 border-emerald-400' : activeLevel === 3 ? 'bg-yellow-500 border-yellow-400' : activeLevel === 2 ? 'bg-orange-500 border-orange-400' : 'bg-red-500 border-red-400')
+                    : 'border-slate-700'}`}
+                  />
+                ))}
+              </div>
+              <span className="text-[11px] text-slate-400 font-medium">{MASTERY_LABELS[activeLevel]}</span>
+            </div>
+            <p className="text-[12.5px] text-slate-300 leading-relaxed">{activeConcept.description}</p>
+            <div>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">How to use</p>
+              <p className="text-[12px] text-slate-400 leading-relaxed">{activeConcept.howToUse}</p>
+            </div>
+            {activeConcept.synergies.length > 0 && (
+              <div>
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Synergies ({activeConcept.synergies.length})</p>
+                <div className="space-y-1.5">
+                  {activeConcept.synergies.map(syn => {
+                    const partner = getConceptById(syn.conceptId)
+                    if (!partner) return null
+                    return (
+                      <div key={syn.conceptId} className="flex items-center gap-2 bg-slate-900/50 rounded-xl px-3 py-2">
+                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: getNodeFill(partner.id) }} />
+                        <span className="text-[11.5px] text-slate-200 flex-1">{partner.shortName}</span>
+                        <div className="flex gap-0.5">
+                          {[1,2,3].map(i => (
+                            <div key={i} className={`w-1.5 h-1.5 rounded-full ${i <= syn.strength ? 'bg-amber-400' : 'bg-slate-700'}`} />
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Right panel (desktop only) ── */}
+      <div className="hidden md:flex w-[300px] flex-shrink-0 border-l border-slate-800/50 flex-col bg-[#06060d]">
 
         <div className="px-5 py-4 border-b border-slate-800/50 space-y-3">
           <div>
