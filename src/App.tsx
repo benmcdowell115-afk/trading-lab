@@ -146,7 +146,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
               <FlaskConical size={15} className="text-amber-400 md:hidden" />
               <FlaskConical size={17} className="text-amber-400 hidden md:block" />
             </div>
-            <div>
+            <div className="hidden sm:block">
               <p className="text-[13px] md:text-[15px] font-black tracking-widest text-slate-100 leading-none">TRADING LAB</p>
               <p className="hidden md:block text-[9px] font-bold text-slate-600 tracking-[0.15em] mt-0.5">ICT · SMC · FUTURES</p>
             </div>
