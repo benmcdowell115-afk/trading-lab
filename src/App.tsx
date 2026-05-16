@@ -140,7 +140,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
     <div className="flex flex-col h-screen bg-[#05050a] overflow-hidden">
       <header className="relative flex-shrink-0 bg-[#06060d] border-b border-slate-800/50">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
-        <div className="relative flex items-center px-5 md:px-6 h-14 md:h-16">
+        <div className="relative flex items-center justify-between px-5 md:px-6 h-14 md:h-16">
           <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0">
             <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 flex items-center justify-center shadow-lg shadow-amber-500/10">
               <FlaskConical size={15} className="text-amber-400 md:hidden" />
@@ -154,7 +154,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
           <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
             <KillZoneClock />
           </div>
-          <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0 ml-auto">
+          <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0">
             {/* Props — hidden on smallest screens, shown sm+ */}
             <button onClick={() => setPropsOpen(true)} className="hidden sm:flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all">
               <Building2 size={13} /><span className="hidden lg:inline">Props</span>
