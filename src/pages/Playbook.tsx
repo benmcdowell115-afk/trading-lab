@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronUp, ChevronLeft, ExternalLink, GraduationCap, TrendingUp, TrendingDown, CheckCircle, XCircle, MinusCircle } from 'lucide-react'
 import { concepts, getConceptById } from '../data/concepts'
 import { setupLibrary, getSetupsForConcept, getConceptsWithSetups, type SetupExample } from '../data/setupLibrary'
+import { PlaybookDiagram } from '../components/PlaybookDiagram'
 
 const CATEGORY_ORDER = ['structure', 'liquidity', 'entry', 'timing', 'bias', 'model'] as const
 
@@ -87,6 +88,9 @@ function SetupCard({ setup }: { setup: SetupExample }) {
       {/* Expanded body */}
       {expanded && (
         <div className="px-4 pb-4 space-y-3 border-t border-slate-800/40 pt-4">
+          {/* Concept diagram */}
+          <PlaybookDiagram conceptId={setup.conceptId} dir={setup.direction} />
+
           <div>
             <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">What Happened</p>
             <p className="text-[12px] text-slate-300 leading-relaxed">{setup.what}</p>
