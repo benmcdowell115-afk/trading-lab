@@ -644,7 +644,30 @@ export function BacktestPage() {
           <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800/40 flex-shrink-0">
             <Crosshair size={13} className="text-amber-400 flex-shrink-0" />
 
-            {sessions.length > 0 && !creating ? (
+            {creating ? (
+              /* ── Input form ── */
+              <div className="flex-1 flex gap-2">
+                <input autoFocus value={newName} onChange={e => setNewName(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter')  createSession()
+                    if (e.key === 'Escape') { setCreating(false); setNewName('') }
+                  }}
+                  placeholder="Session name (e.g. EURUSD 15m May week 1)"
+                  className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-[12px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
+                />
+                <button onClick={createSession} disabled={!newName.trim()}
+                  className="w-8 h-8 flex items-center justify-center rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 disabled:opacity-30 hover:bg-amber-500/25 transition-all">
+                  <Check size={13} />
+                </button>
+                {sessions.length > 0 && (
+                  <button onClick={() => { setCreating(false); setNewName('') }}
+                    className="w-8 h-8 flex items-center justify-center rounded-xl border border-slate-800 text-slate-600 hover:text-slate-300 transition-all">
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+            ) : sessions.length > 0 ? (
+              /* ── Session dropdown ── */
               <>
                 <select
                   value={activeId ?? ''}
@@ -669,23 +692,11 @@ export function BacktestPage() {
                 )}
               </>
             ) : (
-              <div className="flex-1 flex gap-2">
-                <input autoFocus value={newName} onChange={e => setNewName(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') createSession(); if (e.key === 'Escape') setCreating(false) }}
-                  placeholder="Session name (e.g. NQ 15m May week 1)"
-                  className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-[12px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-slate-500 transition-colors"
-                />
-                <button onClick={createSession} disabled={!newName.trim()}
-                  className="w-8 h-8 flex items-center justify-center rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 disabled:opacity-30 transition-all">
-                  <Check size={13} />
-                </button>
-                {sessions.length > 0 && (
-                  <button onClick={() => setCreating(false)}
-                    className="w-8 h-8 flex items-center justify-center rounded-xl border border-slate-800 text-slate-600 hover:text-slate-300 transition-all">
-                    <X size={13} />
-                  </button>
-                )}
-              </div>
+              /* ── No sessions yet — prompt ── */
+              <button onClick={() => setCreating(true)}
+                className="flex-1 flex items-center gap-2 text-[12px] font-semibold text-amber-400/70 hover:text-amber-300 transition-colors">
+                <Plus size={13} /> Create your first session
+              </button>
             )}
           </div>
 
