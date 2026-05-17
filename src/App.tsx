@@ -3,7 +3,7 @@ import {
   FlaskConical, Package, Beaker, Network,
   LayoutTemplate, BookOpen, LineChart, StickyNote,
   Shield, ClipboardCheck, Brain, CalendarDays, Settings, LogOut, BarChart2, Building2,
-  ShieldAlert, Smile, GraduationCap, Crosshair, Grid3X3, X,
+  ShieldAlert, Smile, GraduationCap, Crosshair, Grid3X3, X, MoreVertical,
 } from 'lucide-react'
 import { Landing }        from './pages/Landing'
 import { Builder }        from './pages/Builder'
@@ -197,6 +197,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
   const [propsOpen,     setPropsOpen]     = useState(false)
   const [drawdownOpen,  setDrawdownOpen]  = useState(false)
   const [mindsetOpen,   setMindsetOpen]   = useState(false)
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false)
   const { loadSharedBuild }             = useBuilds()
 
   useEffect(() => {
@@ -226,51 +227,76 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
     <div className="flex flex-col h-screen bg-[#05050a] overflow-hidden">
       <header className="relative flex-shrink-0 bg-[#06060d] border-b border-slate-800/50">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
-        <div className="relative flex items-center justify-between px-5 md:px-6 h-14 md:h-16">
-          <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0">
-            <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 flex items-center justify-center shadow-lg shadow-amber-500/10">
-              <FlaskConical size={15} className="text-amber-400 md:hidden" />
+        <div className="relative flex items-center justify-between px-4 md:px-6 h-12 md:h-16">
+
+          {/* Logo */}
+          <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+            <div className="w-7 h-7 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 flex items-center justify-center shadow-lg shadow-amber-500/10">
+              <FlaskConical size={13} className="text-amber-400 md:hidden" />
               <FlaskConical size={17} className="text-amber-400 hidden md:block" />
             </div>
-            <div className="hidden sm:block">
-              <p className="text-[13px] md:text-[15px] font-black tracking-widest text-slate-100 leading-none">TRADING LAB</p>
+            <div>
+              <p className="text-[12px] md:text-[15px] font-black tracking-widest text-slate-100 leading-none">TRADING LAB</p>
               <p className="hidden md:block text-[9px] font-bold text-slate-600 tracking-[0.15em] mt-0.5">ICT · SMC · FUTURES</p>
             </div>
           </div>
+
+          {/* Desktop: centered clock */}
           <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
             <KillZoneClock />
           </div>
-          <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0">
-            <button onClick={() => setDrawdownOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/8 transition-all">
-              <ShieldAlert size={13} /><span className="hidden lg:inline">Guard</span>
-            </button>
-            <button onClick={() => setMindsetOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-violet-500/40 hover:text-violet-400 hover:bg-violet-500/8 transition-all">
-              <Smile size={13} /><span className="hidden lg:inline">Mindset</span>
-            </button>
-            <button onClick={() => setPropsOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all">
-              <Building2 size={13} /><span className="hidden lg:inline">Props</span>
-            </button>
-            <button onClick={() => setQuizOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-purple-500/40 hover:text-purple-400 hover:bg-purple-500/8 transition-all">
-              <Brain size={13} /><span className="hidden lg:inline">Quiz</span>
-            </button>
-            <button onClick={() => setRulesOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all">
-              <Shield size={13} /><span className="hidden lg:inline">Rules</span>
-            </button>
-            <button onClick={() => setNotesOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-amber-500/40 hover:text-amber-400 hover:bg-amber-500/8 transition-all">
-              <StickyNote size={13} /><span className="hidden lg:inline">Notes</span>
-            </button>
-            <button onClick={() => setSettingsOpen(true)} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-slate-500 hover:text-slate-300 hover:bg-slate-800/40 transition-all">
-              <Settings size={13} /><span className="hidden lg:inline">Settings</span>
-            </button>
+
+          {/* Desktop: full utility buttons */}
+          <div className="hidden md:flex items-center gap-2.5 md:gap-3 flex-shrink-0">
+            <button onClick={() => setDrawdownOpen(true)}  className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/8 transition-all"><ShieldAlert size={13} /><span className="hidden lg:inline">Guard</span></button>
+            <button onClick={() => setMindsetOpen(true)}   className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-violet-500/40 hover:text-violet-400 hover:bg-violet-500/8 transition-all"><Smile size={13} /><span className="hidden lg:inline">Mindset</span></button>
+            <button onClick={() => setPropsOpen(true)}     className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all"><Building2 size={13} /><span className="hidden lg:inline">Props</span></button>
+            <button onClick={() => setQuizOpen(true)}      className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-purple-500/40 hover:text-purple-400 hover:bg-purple-500/8 transition-all"><Brain size={13} /><span className="hidden lg:inline">Quiz</span></button>
+            <button onClick={() => setRulesOpen(true)}     className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all"><Shield size={13} /><span className="hidden lg:inline">Rules</span></button>
+            <button onClick={() => setNotesOpen(true)}     className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-amber-500/40 hover:text-amber-400 hover:bg-amber-500/8 transition-all"><StickyNote size={13} /><span className="hidden lg:inline">Notes</span></button>
+            <button onClick={() => setSettingsOpen(true)}  className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-slate-500 hover:text-slate-300 hover:bg-slate-800/40 transition-all"><Settings size={13} /><span className="hidden lg:inline">Settings</span></button>
             {signOut && (
-              <button onClick={signOut} title={userEmail ?? 'Sign out'} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all">
-                <LogOut size={13} /><span className="hidden lg:inline">Sign out</span>
-              </button>
+              <button onClick={signOut} title={userEmail ?? 'Sign out'} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all"><LogOut size={13} /><span className="hidden lg:inline">Sign out</span></button>
             )}
           </div>
+
+          {/* Mobile: clock inline + single tools button */}
+          <div className="flex md:hidden items-center gap-2 flex-shrink-0">
+            <div className="scale-90 origin-right"><KillZoneClock /></div>
+            <button
+              onClick={() => setMobileToolsOpen(o => !o)}
+              className={`flex items-center justify-center w-8 h-8 rounded-xl border transition-all ${
+                mobileToolsOpen ? 'border-amber-500/40 bg-amber-500/10 text-amber-400' : 'border-slate-800 text-slate-500'
+              }`}>
+              {mobileToolsOpen ? <X size={14} /> : <MoreVertical size={14} />}
+            </button>
+          </div>
         </div>
-        <div className="md:hidden px-5 pb-3"><KillZoneClock /></div>
-        {/* Desktop tab nav — hidden on mobile */}
+
+        {/* Mobile tools sheet */}
+        {mobileToolsOpen && (
+          <div className="md:hidden border-t border-slate-800/40 bg-[#06060d] px-4 py-3">
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { label: 'Guard',    Icon: ShieldAlert, color: 'text-orange-400', onClick: () => { setDrawdownOpen(true);  setMobileToolsOpen(false) } },
+                { label: 'Mindset',  Icon: Smile,       color: 'text-violet-400', onClick: () => { setMindsetOpen(true);   setMobileToolsOpen(false) } },
+                { label: 'Props',    Icon: Building2,   color: 'text-emerald-400',onClick: () => { setPropsOpen(true);     setMobileToolsOpen(false) } },
+                { label: 'Quiz',     Icon: Brain,       color: 'text-purple-400', onClick: () => { setQuizOpen(true);      setMobileToolsOpen(false) } },
+                { label: 'Rules',    Icon: Shield,      color: 'text-red-400',    onClick: () => { setRulesOpen(true);     setMobileToolsOpen(false) } },
+                { label: 'Notes',    Icon: StickyNote,  color: 'text-amber-400',  onClick: () => { setNotesOpen(true);     setMobileToolsOpen(false) } },
+                { label: 'Settings', Icon: Settings,    color: 'text-slate-400',  onClick: () => { setSettingsOpen(true);  setMobileToolsOpen(false) } },
+                ...(signOut ? [{ label: 'Sign out', Icon: LogOut, color: 'text-red-400', onClick: () => { signOut(); setMobileToolsOpen(false) } }] : []),
+              ].map(({ label, Icon, color, onClick }) => (
+                <button key={label} onClick={onClick}
+                  className="flex flex-col items-center gap-1.5 py-2.5 rounded-2xl border border-slate-800/60 bg-slate-900/40 transition-all active:border-slate-600">
+                  <Icon size={16} className={color} />
+                  <span className={`text-[9px] font-bold ${color}`}>{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {/* Desktop tab nav */}
         <nav className="hidden md:flex border-t border-slate-800/40 overflow-x-auto [&::-webkit-scrollbar]:hidden">
           {tabs.map(({ id, label, Icon }) => (
             <button key={id} onClick={() => setTab(id)}
