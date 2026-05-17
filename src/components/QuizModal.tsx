@@ -174,44 +174,51 @@ export function QuizModal({ open, onClose }: Props) {
       {open && (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 md:p-6"
+          /* Mobile: bottom sheet anchored to bottom edge, no side padding
+             Desktop: centered dialog with side padding               */
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 md:p-6 bg-black/80 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.96, opacity: 0, y: 12 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.96, opacity: 0, y: 12 }}
-            transition={{ duration: 0.18 }}
+            /* Mobile: slides up from bottom, full width, tall, top-rounded only
+               Desktop: centered card, max-w-2xl, fully rounded              */
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             onClick={e => e.stopPropagation()}
-            className="w-full max-w-2xl max-h-[92vh] bg-[#0d0d16] border border-slate-700/60 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+            className="w-full sm:max-w-2xl bg-[#0d0d16] border-t sm:border border-slate-700/60 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+            style={{ maxHeight: 'calc(100dvh - 20px)', height: 'auto' }}
           >
+            {/* Drag handle (mobile visual affordance) */}
+            <div className="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
+              <div className="w-10 h-1 bg-slate-700 rounded-full" />
+            </div>
+
             {/* ── Header ── */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-800/60 flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center">
-                  <Brain size={17} className="text-amber-400" />
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-5 border-b border-slate-800/60 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center flex-shrink-0">
+                  <Brain size={16} className="text-amber-400" />
                 </div>
                 <div>
-                  <p className="text-[16px] font-bold text-white leading-none">Concept Quiz</p>
+                  <p className="text-[15px] sm:text-[16px] font-bold text-white leading-none">Concept Quiz</p>
                   {!done && (
-                    <div className="flex items-center gap-2 mt-0.5">
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       <p className="text-[11px] text-slate-500">Question {idx + 1} of {questions.length}</p>
                       {ratedCount >= 5 && weakCount > 0 && (
-                        <>
-                          <span className="text-slate-700">·</span>
-                          <div className="flex items-center gap-1">
-                            <Zap size={9} className="text-amber-500" />
-                            <span className="text-[10px] text-amber-600 font-semibold">Focused on weak spots</span>
-                          </div>
-                        </>
+                        <div className="flex items-center gap-1">
+                          <Zap size={9} className="text-amber-500" />
+                          <span className="text-[10px] text-amber-600 font-semibold">Weak-spot focus</span>
+                        </div>
                       )}
                     </div>
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 {!done && (
-                  <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-1.5">
+                  <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/25 rounded-xl px-2.5 py-1.5">
                     <span className="text-[13px] font-bold text-amber-300">{score}</span>
                     <span className="text-[10px] text-amber-600 font-semibold">pts</span>
                   </div>
@@ -224,35 +231,34 @@ export function QuizModal({ open, onClose }: Props) {
 
             {/* ── Progress bar ── */}
             {!done && (
-              <div className="h-1.5 bg-slate-800/80 flex-shrink-0">
+              <div className="h-1 sm:h-1.5 bg-slate-800/80 flex-shrink-0">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full"
+                  className="h-full bg-gradient-to-r from-amber-500 to-amber-300"
                   animate={{ width: `${((idx + (selected ? 1 : 0)) / questions.length) * 100}%` }}
                   transition={{ duration: 0.4 }}
                 />
               </div>
             )}
 
-            {/* ── Content ── */}
-            <div className="flex-1 overflow-y-auto">
+            {/* ── Scrollable content ── */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
               {done ? (
-                <div className="flex flex-col items-center justify-center py-10 px-8 gap-6 text-center">
-                  <div className="w-20 h-20 rounded-3xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center">
-                    <Trophy size={36} className="text-amber-400" />
+                <div className="flex flex-col items-center justify-center py-8 px-5 sm:py-10 sm:px-8 gap-5 text-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center">
+                    <Trophy size={30} className="text-amber-400" />
                   </div>
                   <div>
-                    <p className="text-[42px] font-black text-white leading-none">
-                      {score}<span className="text-[24px] text-slate-500 font-semibold">/{questions.length}</span>
+                    <p className="text-[38px] sm:text-[42px] font-black text-white leading-none">
+                      {score}<span className="text-[22px] sm:text-[24px] text-slate-500 font-semibold">/{questions.length}</span>
                     </p>
-                    <p className="text-[16px] font-bold mt-2" style={{ color: pct >= 80 ? '#34d399' : pct >= 60 ? '#f59e0b' : '#f87171' }}>
+                    <p className="text-[15px] sm:text-[16px] font-bold mt-2" style={{ color: pct >= 80 ? '#34d399' : pct >= 60 ? '#f59e0b' : '#f87171' }}>
                       {pct}% correct
                     </p>
-                    <p className="text-[13px] text-slate-400 mt-2 leading-relaxed max-w-sm mx-auto">
+                    <p className="text-[12.5px] sm:text-[13px] text-slate-400 mt-2 leading-relaxed max-w-sm mx-auto">
                       {pct >= 80 ? 'Sharp. You know your ICT concepts cold.' : pct >= 60 ? 'Getting there — drill the ones you missed.' : 'Keep going. Repetition is how these concepts stick.'}
                     </p>
                   </div>
 
-                  {/* Missed concepts */}
                   {wrong.length > 0 && (
                     <div className="w-full max-w-sm text-left">
                       <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-2">Study these — you got them wrong</p>
@@ -280,7 +286,7 @@ export function QuizModal({ open, onClose }: Props) {
                     </div>
                   )}
 
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 pb-2">
                     <button onClick={restart}
                       className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-amber-500/15 border border-amber-500/35 text-amber-300 text-[14px] font-semibold hover:bg-amber-500/25 transition-all">
                       <RotateCcw size={14} /> Try Again
@@ -292,41 +298,37 @@ export function QuizModal({ open, onClose }: Props) {
                   </div>
                 </div>
               ) : (
-                <div className="px-6 py-5 space-y-5">
-                  {/* Concept badge + mastery level */}
+                <div className="px-4 sm:px-6 py-4 sm:py-5 space-y-3 sm:space-y-5">
+                  {/* Concept badge row */}
                   {concept && (
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-2.5 h-2.5 rounded-full ${tierDot[concept.tier]}`} />
-                        <span className={`text-[12px] font-bold uppercase tracking-wider ${tierLabel[concept.tier]}`}>{concept.tier}</span>
-                        <span className="text-slate-700 text-[11px]">·</span>
-                        <span className="text-[12px] text-slate-500 capitalize">{concept.category}</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${tierDot[concept.tier]}`} />
+                        <span className={`text-[11px] font-bold uppercase tracking-wider ${tierLabel[concept.tier]}`}>{concept.tier}</span>
+                        <span className="text-slate-700 text-[10px]">·</span>
+                        <span className="text-[11px] text-slate-500 capitalize">{concept.category}</span>
                         {q.type === 'synergy' && (
-                          <>
-                            <span className="text-slate-700 text-[11px]">·</span>
-                            <span className="text-[11px] font-semibold text-amber-500/70 uppercase tracking-wide">Synergy</span>
-                          </>
+                          <span className="text-[10px] font-semibold text-amber-500/70 uppercase tracking-wide">· Synergy</span>
                         )}
                       </div>
-                      {/* Mastery indicator */}
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <div className="flex gap-0.5">
                           {[1,2,3,4,5].map(n => (
-                            <div key={n} className={`w-2.5 h-2.5 rounded-full border transition-all ${n <= cLevel ? MASTERY_COLORS[cLevel] + ' border-transparent' : 'border-slate-700/60'}`} />
+                            <div key={n} className={`w-2 h-2 rounded-full border transition-all ${n <= cLevel ? MASTERY_COLORS[cLevel] + ' border-transparent' : 'border-slate-700/60'}`} />
                           ))}
                         </div>
-                        <span className={`text-[9px] font-bold ${MASTERY_TEXT[cLevel]}`}>{MASTERY_LABELS[cLevel]}</span>
+                        <span className={`text-[9px] font-bold ml-1 ${MASTERY_TEXT[cLevel]}`}>{MASTERY_LABELS[cLevel]}</span>
                       </div>
                     </div>
                   )}
 
-                  {/* Question */}
-                  <div className="bg-slate-900/50 border border-slate-800/60 rounded-2xl px-5 py-4">
-                    <p className="text-[15px] text-slate-100 leading-relaxed font-medium">{q.question}</p>
+                  {/* Question — larger text, less padding on mobile */}
+                  <div className="bg-slate-900/50 border border-slate-800/60 rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4">
+                    <p className="text-[15px] sm:text-[15px] text-slate-100 leading-relaxed font-medium">{q.question}</p>
                   </div>
 
-                  {/* Options */}
-                  <div className="space-y-2.5">
+                  {/* Options — tighter vertical padding on mobile so all 4 fit */}
+                  <div className="space-y-2">
                     {q.options.map((opt, i) => {
                       const isSelected = selected === opt
                       const reveal     = !!selected
@@ -337,18 +339,18 @@ export function QuizModal({ open, onClose }: Props) {
                       else if (reveal)               cls = 'border-slate-800/40 bg-transparent text-slate-600 opacity-50'
                       return (
                         <button key={opt} onClick={() => pick(opt)} disabled={!!selected}
-                          className={`w-full text-left px-5 py-4 rounded-2xl border transition-all flex items-start gap-4 ${cls}`}
+                          className={`w-full text-left px-3.5 sm:px-5 py-3 sm:py-4 rounded-2xl border transition-all flex items-start gap-3 sm:gap-4 ${cls}`}
                         >
-                          <span className={`flex-shrink-0 w-7 h-7 rounded-xl border flex items-center justify-center text-[12px] font-bold transition-all mt-0.5
+                          <span className={`flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-xl border flex items-center justify-center text-[11px] sm:text-[12px] font-bold transition-all mt-0.5
                             ${reveal && isRight ? 'border-emerald-500/60 bg-emerald-500/20 text-emerald-300'
                             : reveal && isSelected ? 'border-red-500/60 bg-red-500/20 text-red-300'
                             : reveal ? 'border-slate-700/40 text-slate-600'
                             : 'border-slate-700 text-slate-500'}`}>
-                            {reveal && isRight ? <CheckCircle size={14} className="text-emerald-400" />
-                            : reveal && isSelected ? <XCircle size={14} className="text-red-400" />
+                            {reveal && isRight ? <CheckCircle size={13} className="text-emerald-400" />
+                            : reveal && isSelected ? <XCircle size={13} className="text-red-400" />
                             : OPTION_LABELS[i]}
                           </span>
-                          <span className="text-[13.5px] leading-relaxed flex-1">{opt}</span>
+                          <span className="text-[13px] sm:text-[13.5px] leading-snug sm:leading-relaxed flex-1">{opt}</span>
                         </button>
                       )
                     })}
@@ -357,11 +359,11 @@ export function QuizModal({ open, onClose }: Props) {
                   {/* Feedback + next */}
                   <AnimatePresence>
                     {selected && (
-                      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 pt-1">
+                      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-2.5 pb-4">
                         <div className={`flex items-center gap-2.5 px-4 py-3 rounded-2xl border ${correct ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
                           {correct
-                            ? <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" />
-                            : <XCircle size={16} className="text-red-400 flex-shrink-0" />}
+                            ? <CheckCircle size={15} className="text-emerald-400 flex-shrink-0" />
+                            : <XCircle size={15} className="text-red-400 flex-shrink-0" />}
                           <p className={`text-[13px] font-semibold ${correct ? 'text-emerald-300' : 'text-red-300'}`}>
                             {correct ? 'Correct!' : `Answer: ${q.correct}`}
                           </p>
