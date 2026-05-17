@@ -251,54 +251,76 @@ export function ConceptMap() {
         </div>
       </div>
 
-      {/* ── Mobile bottom sheet — shows when a concept is tapped ── */}
+      {/* ── Mobile bottom sheet — max 40vh so the map stays visible ── */}
       {activeConcept && (
-        <div className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-[#06060d] border-t border-slate-800/50 rounded-t-2xl max-h-[55vh] overflow-y-auto"
-          onClick={e => e.stopPropagation()}>
-          <div className="flex items-center justify-between px-5 pt-4 pb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getNodeFill(activeConcept.id) }} />
-              <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: colorMode === 'tier' ? tierFill[activeConcept.tier] : masteryFill[activeLevel] }}>
+        <div
+          className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-[#06060d] border-t border-slate-800/60 rounded-t-2xl shadow-2xl"
+          style={{ maxHeight: '40vh' }}
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Drag handle */}
+          <div className="flex justify-center pt-2 pb-1 flex-shrink-0">
+            <div className="w-8 h-1 bg-slate-700 rounded-full" />
+          </div>
+
+          {/* Fixed header — always visible */}
+          <div className="flex items-center justify-between px-4 pb-2 flex-shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: getNodeFill(activeConcept.id) }} />
+              <span className="text-[10px] font-black uppercase tracking-wider flex-shrink-0"
+                style={{ color: colorMode === 'tier' ? tierFill[activeConcept.tier] : masteryFill[activeLevel] }}>
                 {colorMode === 'tier' ? activeConcept.tier : MASTERY_LABELS[activeLevel]}
               </span>
+              <span className="text-slate-700 text-[9px]">·</span>
+              <span className="text-[10px] text-slate-500 capitalize truncate">{activeConcept.category}</span>
             </div>
-            <button onClick={() => setHovered(null)} className="text-slate-500 hover:text-slate-300 text-[18px] leading-none px-1">✕</button>
+            <button
+              onClick={() => setHovered(null)}
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-all flex-shrink-0 ml-2 text-[15px]"
+            >✕</button>
           </div>
-          <div className="px-5 pb-6 space-y-3">
-            <h3 className="text-[16px] font-bold text-white">{activeConcept.name}</h3>
-            <div className="flex items-center gap-2">
+
+          {/* Scrollable body — fills remaining height */}
+          <div className="overflow-y-auto overscroll-contain px-4 pb-5"
+            style={{ maxHeight: 'calc(40vh - 68px)' }}>
+
+            <h3 className="text-[15px] font-bold text-white leading-tight mb-2">{activeConcept.name}</h3>
+
+            {/* Mastery row */}
+            <div className="flex items-center gap-1.5 mb-3">
               <div className="flex gap-0.5">
                 {[1,2,3,4,5].map(n => (
-                  <div key={n} className={`w-3 h-3 rounded-full border ${n <= activeLevel
+                  <div key={n} className={`w-2.5 h-2.5 rounded-full border ${n <= activeLevel
                     ? (activeLevel === 5 ? 'bg-amber-400 border-amber-300' : activeLevel >= 4 ? 'bg-emerald-500 border-emerald-400' : activeLevel === 3 ? 'bg-yellow-500 border-yellow-400' : activeLevel === 2 ? 'bg-orange-500 border-orange-400' : 'bg-red-500 border-red-400')
                     : 'border-slate-700'}`}
                   />
                 ))}
               </div>
-              <span className="text-[11px] text-slate-400 font-medium">{MASTERY_LABELS[activeLevel]}</span>
+              <span className="text-[10px] text-slate-400 font-medium">{MASTERY_LABELS[activeLevel]}</span>
             </div>
-            <p className="text-[12.5px] text-slate-300 leading-relaxed">{activeConcept.description}</p>
-            <div>
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">How to use</p>
-              <p className="text-[12px] text-slate-400 leading-relaxed">{activeConcept.howToUse}</p>
-            </div>
+
+            {/* Description — 3-line clamp, readable without dominating */}
+            <p className="text-[12px] text-slate-300 leading-relaxed line-clamp-3 mb-3">
+              {activeConcept.description}
+            </p>
+
+            {/* Synergies as compact pills */}
             {activeConcept.synergies.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Synergies ({activeConcept.synergies.length})</p>
-                <div className="space-y-1.5">
+                <p className="text-[9.5px] font-black uppercase tracking-wider text-slate-600 mb-2">
+                  Synergies ({activeConcept.synergies.length})
+                </p>
+                <div className="flex flex-wrap gap-1.5">
                   {activeConcept.synergies.map(syn => {
                     const partner = getConceptById(syn.conceptId)
                     if (!partner) return null
                     return (
-                      <div key={syn.conceptId} className="flex items-center gap-2 bg-slate-900/50 rounded-xl px-3 py-2">
-                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: getNodeFill(partner.id) }} />
-                        <span className="text-[11.5px] text-slate-200 flex-1">{partner.shortName}</span>
-                        <div className="flex gap-0.5">
-                          {[1,2,3].map(i => (
-                            <div key={i} className={`w-1.5 h-1.5 rounded-full ${i <= syn.strength ? 'bg-amber-400' : 'bg-slate-700'}`} />
-                          ))}
-                        </div>
-                      </div>
+                      <span key={syn.conceptId}
+                        className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-lg bg-slate-800/70 border border-slate-700/50 text-slate-300">
+                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                          style={{ background: syn.strength === 3 ? '#f59e0b' : syn.strength === 2 ? '#94a3b8' : '#475569' }} />
+                        {partner.shortName}
+                      </span>
                     )
                   })}
                 </div>
