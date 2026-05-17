@@ -3,7 +3,7 @@ import {
   FlaskConical, Package, Beaker, Network,
   LayoutTemplate, BookOpen, LineChart, StickyNote,
   Shield, ClipboardCheck, Brain, CalendarDays, Settings, LogOut, BarChart2, Building2,
-  ShieldAlert, Smile, GraduationCap,
+  ShieldAlert, Smile, GraduationCap, Crosshair,
 } from 'lucide-react'
 import { Landing }        from './pages/Landing'
 import { Builder }        from './pages/Builder'
@@ -16,6 +16,7 @@ import { Plan }           from './pages/Plan'
 import { Calendar }       from './pages/Calendar'
 import { RecapPage }      from './recap/RecapPage'
 import { Playbook }       from './pages/Playbook'
+import { BacktestPage }   from './pages/BacktestPage'
 import { PropFirms }      from './pages/PropFirms'
 import { KillZoneClock }  from './components/KillZoneClock'
 import { SessionNotes }   from './components/SessionNotes'
@@ -34,7 +35,7 @@ const SUPABASE_CONFIGURED = !!(
   import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY
 )
 
-type Tab  = 'builder' | 'chart' | 'map' | 'plan' | 'journal' | 'calendar' | 'templates' | 'builds' | 'recap' | 'playbook'
+type Tab  = 'builder' | 'chart' | 'map' | 'plan' | 'journal' | 'calendar' | 'templates' | 'builds' | 'recap' | 'playbook' | 'backtest'
 type View = 'landing' | 'login' | 'app'
 
 const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
@@ -48,6 +49,7 @@ const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'builds',    label: 'Builds',    Icon: Package        },
   { id: 'recap',     label: 'Recap',     Icon: BarChart2      },
   { id: 'playbook',  label: 'Playbook',  Icon: GraduationCap  },
+  { id: 'backtest',  label: 'Backtest',  Icon: Crosshair      },
 ]
 
 export default function App() {
@@ -214,6 +216,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
         {tab === 'builds'    && <MyBuilds  onLoadBuild={handleLoadBuild} />}
         {tab === 'recap'     && <RecapPage />}
         {tab === 'playbook'  && <Playbook />}
+        {tab === 'backtest'  && <BacktestPage />}
       </main>
 
       <SessionNotes  open={notesOpen}    onClose={() => setNotesOpen(false)} />
