@@ -13,13 +13,13 @@ import { POINT_VALUES } from '../hooks/useSettings'
 import type { Instrument } from '../types'
 
 // ── Constants ────────────────────────────────────────────────────────────────
-// Free TradingView symbols (continuous futures like NQ1! require Pro).
-// Cash/spot instruments mirror futures price action and work on any plan.
+// OANDA CFD symbols — freely embeddable on TradingView without subscription,
+// closely track corresponding futures (NQ, ES, GC, SI).
 const INSTRUMENTS: { label: Instrument; symbol: string }[] = [
-  { label: 'NQ', symbol: 'NASDAQ:NDX'  },   // Nasdaq 100 index  (mirrors NQ futures)
-  { label: 'ES', symbol: 'CBOE:SPX'    },   // S&P 500 index     (mirrors ES futures)
-  { label: 'GC', symbol: 'TVC:GOLD'    },   // Gold spot         (mirrors GC futures)
-  { label: 'SI', symbol: 'TVC:SILVER'  },   // Silver spot       (mirrors SI futures)
+  { label: 'NQ', symbol: 'OANDA:NAS100USD' },
+  { label: 'ES', symbol: 'OANDA:SPX500USD' },
+  { label: 'GC', symbol: 'OANDA:XAUUSD'   },
+  { label: 'SI', symbol: 'OANDA:XAGUSD'   },
 ]
 const TIMEFRAMES = [
   { label: '1m', value: '1' }, { label: '5m', value: '5' },
@@ -28,63 +28,48 @@ const TIMEFRAMES = [
 ]
 const inst2sym = Object.fromEntries(INSTRUMENTS.map(i => [i.label, i.symbol]))
 
-// ── TradingView chart ─────────────────────────────────────────────────────────
-let _tvReady: Promise<void> | null = null
-function getTVReady(): Promise<void> {
-  if (_tvReady) return _tvReady
-  _tvReady = new Promise<void>(resolve => {
-    if ((window as any).TradingView) { resolve(); return }
-    if (!document.querySelector('script[data-tv]')) {
-      const s = document.createElement('script')
-      s.src = 'https://s3.tradingview.com/tv.js'
-      s.setAttribute('data-tv', '1')
-      s.async = true
-      document.head.appendChild(s)
-    }
-    const poll = setInterval(() => {
-      if ((window as any).TradingView) { clearInterval(poll); resolve() }
-    }, 100)
-  })
-  return _tvReady
-}
-
+// ── TradingView Advanced Chart Widget (free, iframe-based) ────────────────────
+// Uses embed-widget-advanced-chart.js which creates a self-contained iframe.
+// No license required. The script reads its config from the tag's innerHTML.
 function TVChart({ symbol, interval }: { symbol: string; interval: string }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const mountedRef   = useRef(true)
-  const idRef        = useRef(`tv_bt_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`)
-  const [error, setError] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    mountedRef.current = true
-    setError(false)
-    const id = idRef.current
-    getTVReady().then(() => {
-      if (!mountedRef.current || !containerRef.current) return
-      try {
-        new (window as any).TradingView.widget({
-          container_id: id, autosize: true,
-          symbol, interval,
-          timezone: 'America/New_York', theme: 'dark', style: '1', locale: 'en',
-          toolbar_bg: '#06060d', enable_publishing: false,
-          allow_symbol_change: true, save_image: false,
-          backgroundColor: '#05050a', gridColor: 'rgba(30,32,48,0.6)',
-          disabled_features: ['border_around_the_chart'],
-        })
-      } catch { if (mountedRef.current) setError(true) }
-    }).catch(() => { if (mountedRef.current) setError(true) })
-    return () => { mountedRef.current = false }
+    const el = ref.current
+    if (!el) return
+    el.innerHTML = ''
+
+    const outer = document.createElement('div')
+    outer.className = 'tradingview-widget-container'
+    outer.style.cssText = 'width:100%;height:100%'
+
+    const inner = document.createElement('div')
+    inner.className = 'tradingview-widget-container__widget'
+    inner.style.cssText = 'width:100%;height:calc(100% - 32px)'
+    outer.appendChild(inner)
+
+    const script = document.createElement('script')
+    script.type  = 'text/javascript'
+    script.async = true
+    script.src   = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'
+    // Config must be the script's text content — the widget reads it on load
+    script.innerHTML = JSON.stringify({
+      autosize: true, symbol, interval,
+      timezone: 'America/New_York',
+      theme: 'dark', style: '1', locale: 'en',
+      backgroundColor: '#05050a',
+      allow_symbol_change: true,
+      save_image: false,
+      calendar: false,
+      hide_volume: false,
+    })
+    outer.appendChild(script)
+    el.appendChild(outer)
+
+    return () => { if (ref.current) ref.current.innerHTML = '' }
   }, [symbol, interval])
 
-  if (error) return (
-    <div className="w-full h-full flex items-center justify-center bg-[#05050a]">
-      <p className="text-slate-500 text-[13px]">Chart failed to load — try reload</p>
-    </div>
-  )
-  return (
-    <div className="w-full h-full">
-      <div id={idRef.current} style={{ width: '100%', height: '100%' }} ref={containerRef} />
-    </div>
-  )
+  return <div ref={ref} className="w-full h-full" />
 }
 
 // ── Concept picker ────────────────────────────────────────────────────────────
