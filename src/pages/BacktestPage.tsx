@@ -1,99 +1,59 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-  Plus, Trash2, TrendingUp, TrendingDown, RefreshCw,
-  Check, X, ChevronDown, ChevronUp, Crosshair, BarChart2,
-  PanelRightClose, PanelRightOpen, Search,
+  Play, Pause, SkipBack, ChevronRight, ChevronLeft,
+  TrendingUp, TrendingDown, Crosshair, KeyRound,
+  ChevronDown, ChevronUp, Trash2, Search, X,
 } from 'lucide-react'
+import { ReplayChart } from '../components/ReplayChart'
+import { useReplayData, TD_KEY_STORAGE, type OHLCVBar } from '../hooks/useReplayData'
+import { calcRPlanned, calcRActual, calcPnl, sessionStats, type BacktestTrade } from '../hooks/useBacktest'
 import { concepts, getConceptById } from '../data/concepts'
-import {
-  useBacktest, calcRPlanned, calcRActual, calcPnl, sessionStats,
-  type BacktestTrade, type BacktestSession,
-} from '../hooks/useBacktest'
-import { POINT_VALUES } from '../hooks/useSettings'
 import type { Instrument } from '../types'
 
-// ── Constants ────────────────────────────────────────────────────────────────
-// FX: symbols are from TradingView's forex data feed — freely embeddable,
-// no subscription required. Standard forex pairs used in ICT methodology.
-const INSTRUMENTS: { label: Instrument; symbol: string }[] = [
-  { label: 'EURUSD', symbol: 'FX:EURUSD' },
-  { label: 'GBPUSD', symbol: 'FX:GBPUSD' },
-  { label: 'USDJPY', symbol: 'FX:USDJPY' },
-  { label: 'GBPJPY', symbol: 'FX:GBPJPY' },
-  { label: 'AUDUSD', symbol: 'FX:AUDUSD' },
-  { label: 'NZDUSD', symbol: 'FX:NZDUSD' },
-]
-const TIMEFRAMES = [
-  { label: '1m', value: '1' }, { label: '5m', value: '5' },
-  { label: '15m', value: '15' }, { label: '1H', value: '60' },
-  { label: '4H', value: '240' }, { label: 'D', value: 'D' },
-]
-const inst2sym = Object.fromEntries(INSTRUMENTS.map(i => [i.label, i.symbol]))
+// ── Constants ─────────────────────────────────────────────────────────────────
+const INSTRUMENTS: Instrument[] = ['EURUSD','GBPUSD','USDJPY','GBPJPY','AUDUSD','NZDUSD']
+const TIMEFRAMES = ['1m','5m','15m','1H','4H'] as const
+const INITIAL_CONTEXT = 80  // bars shown on load before replay starts
+const TRADES_KEY = 'tl:replay-trades'
 
-// ── TradingView Advanced Chart Widget (free, iframe-based) ────────────────────
-// Uses embed-widget-advanced-chart.js which creates a self-contained iframe.
-// No license required. The script reads its config from the tag's innerHTML.
-function TVChart({ symbol, interval }: { symbol: string; interval: string }) {
-  const ref = useRef<HTMLDivElement>(null)
+type TF = typeof TIMEFRAMES[number]
 
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    el.innerHTML = ''
-
-    const outer = document.createElement('div')
-    outer.className = 'tradingview-widget-container'
-    outer.style.cssText = 'width:100%;height:100%'
-
-    const inner = document.createElement('div')
-    inner.className = 'tradingview-widget-container__widget'
-    inner.style.cssText = 'width:100%;height:calc(100% - 32px)'
-    outer.appendChild(inner)
-
-    const script = document.createElement('script')
-    script.type  = 'text/javascript'
-    script.async = true
-    script.src   = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'
-    // Config must be the script's text content — the widget reads it on load
-    script.innerHTML = JSON.stringify({
-      autosize: true, symbol, interval,
-      timezone: 'America/New_York',
-      theme: 'dark', style: '1', locale: 'en',
-      backgroundColor: '#05050a',
-      allow_symbol_change: true,
-      save_image: false,
-      calendar: false,
-      hide_volume: false,
-    })
-    outer.appendChild(script)
-    el.appendChild(outer)
-
-    return () => { if (ref.current) ref.current.innerHTML = '' }
-  }, [symbol, interval])
-
-  return <div ref={ref} className="w-full h-full" />
+interface ActiveTrade {
+  dir: 'long' | 'short'
+  entry: number
+  stop: number
+  target: number
+  conceptIds: string[]
+  notes: string
+  barIndex: number
 }
 
-// ── Concept picker ────────────────────────────────────────────────────────────
+function fmtBar(bar: OHLCVBar | undefined) {
+  if (!bar) return null
+  const d = new Date(bar.time * 1000)
+  const date = d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+  const time = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12: false, timeZone:'America/New_York' })
+  return { date, time: `${time} ET` }
+}
+
+function priceFmt(p: number, inst: string) {
+  const dp = inst.includes('JPY') ? 3 : 5
+  return p.toFixed(dp)
+}
+
+function today() { return new Date().toISOString().slice(0,10) }
+
+// ── Concept picker (condensed) ────────────────────────────────────────────────
 function ConceptPicker({ selected, onChange }: { selected: string[]; onChange: (ids: string[]) => void }) {
   const [search, setSearch] = useState('')
   const toggle = (id: string) =>
     onChange(selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id])
-
   const filtered = concepts.filter(c =>
-    !search || c.shortName.toLowerCase().includes(search.toLowerCase()) ||
-    c.name.toLowerCase().includes(search.toLowerCase())
-  )
-
-  const tierDot: Record<string, string> = {
-    basic: 'bg-emerald-400', intermediate: 'bg-blue-400', advanced: 'bg-purple-400',
-  }
-
+    !search || c.shortName.toLowerCase().includes(search.toLowerCase()))
   return (
     <div className="space-y-2">
-      {/* Selected chips */}
       {selected.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1">
           {selected.map(id => {
             const c = getConceptById(id)
             return c ? (
@@ -105,28 +65,19 @@ function ConceptPicker({ selected, onChange }: { selected: string[]; onChange: (
           })}
         </div>
       )}
-
-      {/* Search */}
       <div className="relative">
         <Search size={10} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600" />
-        <input
-          value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search concepts…"
-          className="w-full bg-slate-900/70 border border-slate-800 rounded-xl pl-7 pr-3 py-1.5 text-[11px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-slate-600 transition-all"
-        />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search concepts…"
+          className="w-full bg-slate-900/70 border border-slate-800 rounded-lg pl-7 pr-3 py-1.5 text-[10.5px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-slate-600 transition-all" />
       </div>
-
-      {/* Concept grid */}
-      <div className="max-h-[130px] overflow-y-auto grid grid-cols-2 gap-1 pr-1">
+      <div className="max-h-[100px] overflow-y-auto grid grid-cols-2 gap-1 pr-1">
         {filtered.map(c => (
           <button key={c.id} onClick={() => toggle(c.id)}
-            className={`flex items-center gap-1.5 text-left px-2 py-1.5 rounded-lg border text-[10.5px] font-medium transition-all ${
+            className={`flex items-center gap-1.5 text-left px-2 py-1 rounded-lg border text-[10px] font-medium transition-all ${
               selected.includes(c.id)
                 ? 'bg-amber-500/12 border-amber-500/35 text-amber-300'
                 : 'border-slate-800/60 text-slate-500 hover:border-slate-700 hover:text-slate-300 bg-slate-900/20'
-            }`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tierDot[c.tier]}`} />
+            }`}>
             <span className="truncate">{c.shortName}</span>
           </button>
         ))}
@@ -135,641 +86,562 @@ function ConceptPicker({ selected, onChange }: { selected: string[]; onChange: (
   )
 }
 
-// ── Trade card ────────────────────────────────────────────────────────────────
-function TradeCard({
-  trade, onResult, onDelete,
-}: {
-  trade: BacktestTrade
-  onResult: (id: string, result: 'win' | 'loss' | 'breakeven', exit: number) => void
-  onDelete: (id: string) => void
-}) {
-  const [resolving, setResolving] = useState(false)
-  const [exitInput, setExitInput] = useState('')
-  const [expanded, setExpanded]   = useState(false)
-
-  const risk    = Math.abs(trade.entryPrice - trade.stopPrice)
-  const riskDol = risk * POINT_VALUES[trade.instrument]
-
-  const handleResult = (result: 'win' | 'loss' | 'breakeven') => {
-    const exit = parseFloat(exitInput)
-    if (isNaN(exit)) return
-    onResult(trade.id, result, exit)
-    setResolving(false)
-    setExitInput('')
-  }
-
-  const resultBadge = {
+// ── Trade history card ────────────────────────────────────────────────────────
+function TradeCard({ trade, onDelete }: { trade: BacktestTrade; onDelete: (id: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const badge = {
     win:       'bg-emerald-500/12 border-emerald-500/30 text-emerald-400',
     loss:      'bg-red-500/12 border-red-500/30 text-red-400',
-    breakeven: 'bg-slate-700/60 border-slate-600 text-slate-400',
+    breakeven: 'bg-slate-700/50 border-slate-600 text-slate-400',
   }
-
   return (
-    <div className={`rounded-2xl border overflow-hidden transition-all ${
-      trade.result === null
-        ? 'bg-[#0d0d18] border-amber-500/20'
-        : trade.result === 'win'
-        ? 'bg-[#0a0f0d] border-emerald-500/15'
-        : trade.result === 'loss'
-        ? 'bg-[#0f0a0a] border-red-500/15'
-        : 'bg-[#0b0b12] border-slate-800/50'
+    <div className={`rounded-xl border overflow-hidden ${
+      trade.result === 'win'  ? 'bg-[#0a0f0d] border-emerald-500/15' :
+      trade.result === 'loss' ? 'bg-[#0f0a0a] border-red-500/15' : 'bg-[#0b0b14] border-slate-800/50'
     }`}>
-
-      {/* Card header */}
-      <div className="flex items-center gap-3 px-4 py-3">
-        {/* Direction */}
-        <div className={`w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 ${
-          trade.direction === 'long'
-            ? 'bg-emerald-500/15 border border-emerald-500/30'
-            : 'bg-red-500/15 border border-red-500/30'
-        }`}>
+      <div className="flex items-center gap-2.5 px-3 py-2.5">
+        <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${
+          trade.direction === 'long' ? 'bg-emerald-500/15' : 'bg-red-500/15'}`}>
           {trade.direction === 'long'
-            ? <TrendingUp size={12} className="text-emerald-400" />
-            : <TrendingDown size={12} className="text-red-400" />}
+            ? <TrendingUp size={11} className="text-emerald-400" />
+            : <TrendingDown size={11} className="text-red-400" />}
         </div>
-
-        {/* Info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-black text-amber-300/80"
-                  style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10.5px] font-black text-amber-300/80" style={{ fontFamily:"'JetBrains Mono',monospace" }}>
               {trade.instrument}
             </span>
-            <span className="text-[10px] text-slate-600">·</span>
-            <span className="text-[10px] text-slate-500">{trade.chartDate}</span>
-
-            {/* Result / pending */}
-            {trade.result ? (
-              <span className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full border ${resultBadge[trade.result]}`}>
+            <span className="text-[9.5px] text-slate-600">{trade.chartDate}</span>
+            {trade.result && (
+              <span className={`ml-auto text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border ${badge[trade.result]}`}>
                 {trade.result === 'win' ? `+${trade.rAchieved}R` : trade.result === 'loss' ? `${trade.rAchieved}R` : 'BE'}
-              </span>
-            ) : (
-              <span className="ml-auto text-[9px] font-bold px-2 py-0.5 rounded-full border border-amber-500/30 bg-amber-500/8 text-amber-400 animate-pulse">
-                PENDING
               </span>
             )}
           </div>
-
-          {/* Prices */}
-          <div className="flex items-center gap-1 mt-0.5 text-[10px]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+          <div className="flex items-center gap-1 mt-0.5 text-[9.5px]" style={{ fontFamily:"'JetBrains Mono',monospace" }}>
             <span className="text-slate-400">{trade.entryPrice}</span>
-            <span className="text-slate-700">→</span>
+            <span className="text-slate-700">·</span>
             <span className="text-red-400/70">SL {trade.stopPrice}</span>
-            <span className="text-slate-700">→</span>
+            <span className="text-slate-700">·</span>
             <span className="text-emerald-400/70">TP {trade.targetPrice}</span>
-            <span className="text-slate-700 ml-1">|</span>
-            <span className="text-slate-500">{trade.rPlanned}R plan</span>
           </div>
         </div>
-
-        {/* Expand + delete */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <button onClick={() => setExpanded(e => !e)}
-            className="w-6 h-6 flex items-center justify-center text-slate-600 hover:text-slate-300 transition-colors">
-            {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        <div className="flex items-center gap-1">
+          <button onClick={() => setOpen(o => !o)} className="w-5 h-5 flex items-center justify-center text-slate-600 hover:text-slate-300 transition-colors">
+            {open ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
           </button>
-          <button onClick={() => onDelete(trade.id)}
-            className="w-6 h-6 flex items-center justify-center text-slate-700 hover:text-red-400 transition-colors">
-            <Trash2 size={10} />
+          <button onClick={() => onDelete(trade.id)} className="w-5 h-5 flex items-center justify-center text-slate-700 hover:text-red-400 transition-colors">
+            <Trash2 size={9} />
           </button>
         </div>
       </div>
-
-      {/* Expanded details */}
-      {expanded && (
-        <div className="px-4 pb-3 border-t border-slate-800/40 pt-3 space-y-3">
-          {/* Stats row */}
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { label: 'Risk pts', value: risk.toFixed(2) },
-              { label: 'Risk $', value: `$${riskDol.toLocaleString()}` },
-              { label: trade.result ? 'P&L' : 'Target R', value: trade.result ? `${trade.pnlDollar! >= 0 ? '+' : ''}$${trade.pnlDollar!.toLocaleString()}` : `${trade.rPlanned}R` },
-            ].map(s => (
-              <div key={s.label} className="bg-slate-900/50 rounded-xl px-2.5 py-2 text-center">
-                <p className="text-[9px] text-slate-600 uppercase tracking-wider">{s.label}</p>
-                <p className="text-[12px] font-bold text-slate-200 mt-0.5"
-                   style={{ fontFamily: "'JetBrains Mono', monospace" }}>{s.value}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Concepts */}
-          {trade.conceptIds.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {trade.conceptIds.map(id => {
-                const c = getConceptById(id)
-                return c ? (
-                  <span key={id} className="text-[10px] text-slate-400 bg-slate-800/60 border border-slate-700/40 px-2 py-0.5 rounded-lg">
-                    {c.shortName}
-                  </span>
-                ) : null
-              })}
-            </div>
-          )}
-
-          {/* Notes */}
-          {trade.notes && (
-            <p className="text-[11px] text-slate-500 leading-relaxed">{trade.notes}</p>
-          )}
+      {open && trade.conceptIds.length > 0 && (
+        <div className="px-3 pb-2.5 border-t border-slate-800/30 pt-2 flex flex-wrap gap-1">
+          {trade.conceptIds.map(id => {
+            const c = getConceptById(id)
+            return c ? <span key={id} className="text-[9.5px] text-slate-500 bg-slate-800/60 px-1.5 py-0.5 rounded">{c.shortName}</span> : null
+          })}
+          {trade.notes && <p className="w-full text-[10px] text-slate-600 mt-1">{trade.notes}</p>}
         </div>
       )}
-
-      {/* Mark result section */}
-      {trade.result === null && (
-        <div className="px-4 pb-3 border-t border-slate-800/30">
-          {!resolving ? (
-            <button onClick={() => setResolving(true)}
-              className="mt-2.5 w-full py-2 rounded-xl border border-slate-700/50 text-[11px] font-semibold text-slate-500 hover:border-amber-500/30 hover:text-amber-400 hover:bg-amber-500/5 transition-all">
-              Mark Result →
-            </button>
-          ) : (
-            <div className="mt-2.5 space-y-2">
-              <input
-                autoFocus
-                value={exitInput} onChange={e => setExitInput(e.target.value)}
-                placeholder="Actual exit price"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-[12px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-slate-500 transition-colors"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              />
-              <div className="grid grid-cols-3 gap-1.5">
-                <button onClick={() => handleResult('win')}
-                  disabled={!exitInput}
-                  className="py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-[11px] font-bold hover:bg-emerald-500/20 transition-all disabled:opacity-30">
-                  Win
-                </button>
-                <button onClick={() => handleResult('loss')}
-                  disabled={!exitInput}
-                  className="py-2 rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 text-[11px] font-bold hover:bg-red-500/20 transition-all disabled:opacity-30">
-                  Loss
-                </button>
-                <button onClick={() => handleResult('breakeven')}
-                  disabled={!exitInput}
-                  className="py-2 rounded-xl border border-slate-700 bg-slate-800/40 text-slate-400 text-[11px] font-bold hover:bg-slate-700/60 transition-all disabled:opacity-30">
-                  BE
-                </button>
-              </div>
-              <button onClick={() => { setResolving(false); setExitInput('') }}
-                className="w-full text-[10px] text-slate-700 hover:text-slate-400 transition-colors">
-                cancel
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ── Log trade form ────────────────────────────────────────────────────────────
-function LogForm({
-  instrument, onLog,
-}: {
-  instrument: Instrument
-  onLog: (t: Omit<BacktestTrade, 'id' | 'createdAt'>) => void
-}) {
-  const [dir,      setDir]      = useState<'long' | 'short'>('long')
-  const [date,     setDate]     = useState(new Date().toISOString().slice(0, 10))
-  const [inst,     setInst]     = useState<Instrument>(instrument as Instrument)
-  const [entry,    setEntry]    = useState('')
-  const [stop,     setStop]     = useState('')
-  const [target,   setTarget]   = useState('')
-  const [concepts, setConcepts] = useState<string[]>([])
-  const [notes,    setNotes]    = useState('')
-
-  // sync instrument prop
-  useEffect(() => { setInst(instrument) }, [instrument])
-
-  const entryN  = parseFloat(entry)
-  const stopN   = parseFloat(stop)
-  const targetN = parseFloat(target)
-  const valid   = !isNaN(entryN) && !isNaN(stopN) && !isNaN(targetN) && stopN !== entryN
-
-  const riskPts  = valid ? Math.abs(entryN - stopN) : null
-  const riskDol  = riskPts ? riskPts * POINT_VALUES[inst] : null
-  const rPlanned = valid ? calcRPlanned(dir, entryN, stopN, targetN) : null
-
-  const submit = () => {
-    if (!valid) return
-    onLog({
-      direction: dir, instrument: inst,
-      entryPrice: entryN, stopPrice: stopN, targetPrice: targetN,
-      actualExitPrice: null, result: null,
-      rPlanned: rPlanned!, rAchieved: null, pnlDollar: null,
-      conceptIds: concepts, chartDate: date, notes,
-    })
-    setEntry(''); setStop(''); setTarget('')
-    setConcepts([]); setNotes('')
-  }
-
-  const monoStyle = { fontFamily: "'JetBrains Mono', monospace" }
-  const numCls = 'w-full bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-2 text-[12px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-slate-600 transition-all'
-
-  return (
-    <div className="space-y-3">
-      {/* Direction + date row */}
-      <div className="flex gap-2">
-        <div className="flex rounded-xl overflow-hidden border border-slate-800 flex-shrink-0">
-          {(['long', 'short'] as const).map(d => (
-            <button key={d} onClick={() => setDir(d)}
-              className={`px-4 py-2 text-[11px] font-bold uppercase tracking-wider transition-all ${
-                dir === d
-                  ? d === 'long'
-                    ? 'bg-emerald-500/20 text-emerald-300'
-                    : 'bg-red-500/20 text-red-300'
-                  : 'text-slate-600 hover:text-slate-300'
-              }`}>
-              {d === 'long' ? '↑ Long' : '↓ Short'}
-            </button>
-          ))}
-        </div>
-        <input type="date" value={date} onChange={e => setDate(e.target.value)}
-          className="flex-1 bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-slate-300 focus:outline-none focus:border-slate-600 transition-all" />
-      </div>
-
-      {/* Instrument selector */}
-      <div className="flex gap-1">
-        {(INSTRUMENTS.map(x => x.label)).map(i => (
-          <button key={i} onClick={() => setInst(i)}
-            className={`flex-1 py-1.5 rounded-xl border text-[11px] font-bold transition-all ${
-              inst === i
-                ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
-                : 'border-slate-800 text-slate-600 hover:border-slate-700 hover:text-slate-300'
-            }`} style={monoStyle}>
-            {i}
-          </button>
-        ))}
-      </div>
-
-      {/* Entry / Stop / Target */}
-      <div className="grid grid-cols-3 gap-2">
-        <div>
-          <p className="text-[9px] text-slate-600 font-bold uppercase tracking-wider mb-1">Entry</p>
-          <input value={entry} onChange={e => setEntry(e.target.value)} placeholder="20500"
-            className={numCls} style={monoStyle} />
-        </div>
-        <div>
-          <p className="text-[9px] text-red-500/70 font-bold uppercase tracking-wider mb-1">Stop</p>
-          <input value={stop} onChange={e => setStop(e.target.value)} placeholder="20470"
-            className={numCls} style={monoStyle} />
-        </div>
-        <div>
-          <p className="text-[9px] text-emerald-500/70 font-bold uppercase tracking-wider mb-1">Target</p>
-          <input value={target} onChange={e => setTarget(e.target.value)} placeholder="20590"
-            className={numCls} style={monoStyle} />
-        </div>
-      </div>
-
-      {/* Live R + risk preview */}
-      {valid && (
-        <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-900/50 border border-slate-800/50">
-          <div className="text-center flex-1">
-            <p className="text-[9px] text-slate-600 uppercase tracking-wider">Risk</p>
-            <p className="text-[13px] font-bold text-red-400 mt-0.5" style={monoStyle}>
-              {riskPts} pts · ${riskDol?.toLocaleString()}
-            </p>
-          </div>
-          <div className="w-px h-8 bg-slate-800" />
-          <div className="text-center flex-1">
-            <p className="text-[9px] text-slate-600 uppercase tracking-wider">Planned R</p>
-            <p className={`text-[13px] font-bold mt-0.5 ${rPlanned! >= 2 ? 'text-emerald-400' : rPlanned! >= 1 ? 'text-amber-400' : 'text-red-400'}`}
-               style={monoStyle}>
-              {rPlanned}R
-            </p>
-          </div>
-          <div className="w-px h-8 bg-slate-800" />
-          <div className="text-center flex-1">
-            <p className="text-[9px] text-slate-600 uppercase tracking-wider">Direction</p>
-            <p className={`text-[13px] font-bold mt-0.5 ${dir === 'long' ? 'text-emerald-400' : 'text-red-400'}`}>
-              {dir === 'long' ? '↑ LONG' : '↓ SHORT'}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Concepts */}
-      <div>
-        <p className="text-[9px] text-slate-600 font-bold uppercase tracking-wider mb-2">ICT Concepts Used</p>
-        <ConceptPicker selected={concepts} onChange={setConcepts} />
-      </div>
-
-      {/* Notes */}
-      <textarea value={notes} onChange={e => setNotes(e.target.value)}
-        placeholder="Setup description, what you saw, why you took it…"
-        rows={2}
-        className="w-full bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-2 text-[11.5px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-slate-600 transition-all resize-none"
-      />
-
-      {/* Submit */}
-      <button onClick={submit} disabled={!valid}
-        className="w-full py-3 rounded-xl border border-amber-500/35 bg-amber-500/12 text-amber-300 text-[12px] font-bold hover:bg-amber-500/22 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
-        Log Trade →
-      </button>
-    </div>
-  )
-}
-
-// ── Session stats bar ─────────────────────────────────────────────────────────
-function StatsBar({ session }: { session: BacktestSession }) {
-  const s = sessionStats(session.trades)
-  const pending = session.trades.filter(t => t.result === null).length
-
-  if (session.trades.length === 0) return (
-    <div className="px-4 py-3 border-b border-slate-800/40 text-center">
-      <p className="text-[11px] text-slate-700">Log your first trade to see stats</p>
-    </div>
-  )
-
-  return (
-    <div className="px-4 py-3 border-b border-slate-800/40 grid grid-cols-4 gap-2">
-      {[
-        { label: 'Win Rate', value: `${s.winRate}%`, color: s.winRate >= 60 ? 'text-emerald-400' : s.winRate >= 40 ? 'text-amber-400' : 'text-red-400' },
-        { label: 'Avg R',    value: s.total > 0 ? (s.avgR >= 0 ? `+${s.avgR}` : `${s.avgR}`) : '—', color: s.avgR >= 0 ? 'text-emerald-400' : 'text-red-400' },
-        { label: 'Total R',  value: s.total > 0 ? (s.totalR >= 0 ? `+${s.totalR}` : `${s.totalR}`) : '—', color: s.totalR >= 0 ? 'text-emerald-400' : 'text-red-400' },
-        { label: 'W / L',    value: `${s.wins}/${s.losses}`, color: 'text-slate-300' },
-      ].map(stat => (
-        <div key={stat.label} className="text-center">
-          <p className="text-[9px] text-slate-600 uppercase tracking-wider">{stat.label}</p>
-          <p className={`text-[13px] font-black mt-0.5 ${stat.color}`}
-             style={{ fontFamily: "'JetBrains Mono', monospace" }}>{stat.value}</p>
-        </div>
-      ))}
-      {pending > 0 && (
-        <div className="col-span-4 text-center">
-          <span className="text-[10px] text-amber-400/70">{pending} pending result{pending !== 1 ? 's' : ''}</span>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ── Concept performance breakdown ─────────────────────────────────────────────
-function ConceptBreakdown({ session }: { session: BacktestSession }) {
-  const s = sessionStats(session.trades)
-  const entries = Object.entries(s.byConcept)
-    .filter(([, v]) => v.total >= 2)
-    .sort((a, b) => (b[1].wins / b[1].total) - (a[1].wins / a[1].total))
-    .slice(0, 5)
-
-  if (entries.length === 0) return null
-
-  return (
-    <div className="px-4 py-4 border-t border-slate-800/40">
-      <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-3">Concept Performance</p>
-      <div className="space-y-2">
-        {entries.map(([cid, v]) => {
-          const c = getConceptById(cid)
-          if (!c) return null
-          const wr = Math.round((v.wins / v.total) * 100)
-          return (
-            <div key={cid} className="flex items-center gap-3">
-              <span className="text-[11px] text-slate-400 w-28 truncate flex-shrink-0">{c.shortName}</span>
-              <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all ${wr >= 60 ? 'bg-emerald-500' : wr >= 40 ? 'bg-amber-500' : 'bg-red-500'}`}
-                  style={{ width: `${wr}%` }}
-                />
-              </div>
-              <span className={`text-[10px] font-bold w-8 text-right flex-shrink-0 ${wr >= 60 ? 'text-emerald-400' : wr >= 40 ? 'text-amber-400' : 'text-red-400'}`}>
-                {wr}%
-              </span>
-              <span className="text-[9px] text-slate-600 flex-shrink-0">{v.wins}/{v.total}</span>
-            </div>
-          )
-        })}
-      </div>
     </div>
   )
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export function BacktestPage() {
-  const { sessions, activeSession, activeId, setActiveId, newSession, deleteSession, addTrade, updateTrade, deleteTrade } = useBacktest()
+  const { bars, loading, error, load } = useReplayData()
 
   const [instrument, setInstrument] = useState<Instrument>('EURUSD')
-  const [tf,         setTf]         = useState('15')
-  const [chartKey,   setChartKey]   = useState(0)
-  const [panelOpen,  setPanelOpen]  = useState(true)
-  const [logOpen,    setLogOpen]    = useState(true)
-  const [newName,    setNewName]    = useState('')
-  const [creating,   setCreating]   = useState(false)
+  const [tf,         setTf]         = useState<TF>('15m')
+  const [startDate,  setStartDate]  = useState(() => {
+    const d = new Date(); d.setMonth(d.getMonth() - 1); return d.toISOString().slice(0,10)
+  })
+  const [apiKey,     setApiKey]     = useState(() => localStorage.getItem(TD_KEY_STORAGE) ?? '')
+  const [showKeyInput, setShowKeyInput] = useState(false)
+  const [keyDraft,   setKeyDraft]   = useState('')
 
-  const symbol = inst2sym[instrument]
+  const [cursor,     setCursor]     = useState(INITIAL_CONTEXT)
+  const [playing,    setPlaying]    = useState(false)
 
-  const handleResult = (tradeId: string, result: 'win' | 'loss' | 'breakeven', exit: number) => {
-    const trade = activeSession?.trades.find(t => t.id === tradeId)
-    if (!trade) return
-    const rAchieved = calcRActual(trade.direction, trade.entryPrice, trade.stopPrice, exit)
-    const pnlDollar = calcPnl(trade.direction, trade.instrument, trade.entryPrice, exit)
-    updateTrade(tradeId, { result, actualExitPrice: exit, rAchieved, pnlDollar })
+  const [activeTrade, setActiveTrade] = useState<ActiveTrade | null>(null)
+
+  // Trade form state
+  const [dir,        setDir]        = useState<'long'|'short'>('long')
+  const [entryInput, setEntryInput] = useState('')
+  const [stopInput,  setStopInput]  = useState('')
+  const [tpInput,    setTpInput]    = useState('')
+  const [tradeConcepts, setTradeConcepts] = useState<string[]>([])
+  const [tradeNotes, setTradeNotes] = useState('')
+
+  const [trades, setTrades] = useState<BacktestTrade[]>(() => {
+    try { return JSON.parse(localStorage.getItem(TRADES_KEY) ?? '[]') }
+    catch { return [] }
+  })
+
+  useEffect(() => { localStorage.setItem(TRADES_KEY, JSON.stringify(trades)) }, [trades])
+
+  // ── Auto-play ───────────────────────────────────────────────────────────────
+  const playRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  useEffect(() => {
+    if (!playing) { if (playRef.current) clearInterval(playRef.current); return }
+    playRef.current = setInterval(() => {
+      setCursor(c => {
+        if (c >= bars.length) { setPlaying(false); return c }
+        return c + 1
+      })
+    }, 400)
+    return () => { if (playRef.current) clearInterval(playRef.current) }
+  }, [playing, bars.length])
+
+  // ── Auto-detect stop/target hit ─────────────────────────────────────────────
+  useEffect(() => {
+    if (!activeTrade || !bars.length || cursor === 0) return
+    const bar = bars[cursor - 1]
+    if (!bar) return
+    const { dir: d, stop, target } = activeTrade
+    let result: 'win'|'loss'|null = null
+    let exitPrice = 0
+    if (d === 'long') {
+      if (bar.low <= stop)    { result = 'loss'; exitPrice = stop }
+      else if (bar.high >= target) { result = 'win';  exitPrice = target }
+    } else {
+      if (bar.high >= stop)   { result = 'loss'; exitPrice = stop }
+      else if (bar.low <= target)  { result = 'win';  exitPrice = target }
+    }
+    if (result) closeTrade(result, exitPrice)
+  }, [cursor]) // eslint-disable-line
+
+  // ── Reset cursor when new data loads ────────────────────────────────────────
+  useEffect(() => {
+    if (bars.length > 0) setCursor(Math.min(INITIAL_CONTEXT, Math.floor(bars.length / 2)))
+  }, [bars])
+
+  // ── Actions ─────────────────────────────────────────────────────────────────
+  const step = (n: number) => {
+    setPlaying(false)
+    setCursor(c => Math.max(1, Math.min(c + n, bars.length)))
   }
 
-  const createSession = () => {
-    if (!newName.trim()) return
-    newSession(newName.trim())
-    setNewName('')
-    setCreating(false)
+  const handleLoad = () => {
+    setPlaying(false)
+    setActiveTrade(null)
+    load(instrument, tf, startDate, apiKey)
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  const saveKey = () => {
+    const k = keyDraft.trim()
+    setApiKey(k)
+    localStorage.setItem(TD_KEY_STORAGE, k)
+    setShowKeyInput(false)
+    setKeyDraft('')
+  }
+
+  const openTrade = () => {
+    const e = parseFloat(entryInput), s = parseFloat(stopInput), t = parseFloat(tpInput)
+    if (isNaN(e) || isNaN(s) || isNaN(t) || s === e) return
+    setActiveTrade({ dir, entry: e, stop: s, target: t, conceptIds: tradeConcepts, notes: tradeNotes, barIndex: cursor })
+    setEntryInput(''); setStopInput(''); setTpInput('')
+    setTradeConcepts([]); setTradeNotes('')
+  }
+
+  const closeTrade = (result: 'win'|'loss'|'breakeven', exitPrice: number) => {
+    if (!activeTrade) return
+    const { dir: d, entry, stop, target, conceptIds, notes } = activeTrade
+    const rPlanned  = calcRPlanned(d, entry, stop, target)
+    const rAchieved = calcRActual(d, entry, stop, exitPrice)
+    const pnlDollar = calcPnl(d, instrument, entry, exitPrice)
+    const trade: BacktestTrade = {
+      id: crypto.randomUUID(),
+      direction: d, instrument,
+      entryPrice: entry, stopPrice: stop, targetPrice: target,
+      actualExitPrice: exitPrice, result, rPlanned, rAchieved, pnlDollar,
+      conceptIds, notes,
+      chartDate: bars[activeTrade.barIndex]
+        ? new Date(bars[activeTrade.barIndex].time * 1000).toISOString().slice(0,10)
+        : today(),
+      createdAt: new Date().toISOString(),
+    }
+    setTrades(prev => [trade, ...prev])
+    setActiveTrade(null)
+  }
+
+  const deleteTrade = (id: string) => setTrades(prev => prev.filter(t => t.id !== id))
+
+  // ── Derived display values ───────────────────────────────────────────────────
+  const currentBar  = bars[cursor - 1]
+  const barInfo     = fmtBar(currentBar)
+  const hasData     = bars.length > 0
+  const entryN = parseFloat(entryInput), stopN = parseFloat(stopInput), tpN = parseFloat(tpInput)
+  const formValid = !isNaN(entryN) && !isNaN(stopN) && !isNaN(tpN) && stopN !== entryN
+  const riskPts   = formValid ? Math.abs(entryN - stopN) : null
+  const rPlanned  = formValid ? calcRPlanned(dir, entryN, stopN, tpN) : null
+
+  const currentClose = currentBar?.close ?? 0
+  const unrealizedPts = activeTrade
+    ? (activeTrade.dir === 'long' ? currentClose - activeTrade.entry : activeTrade.entry - currentClose)
+    : 0
+  const riskPtsActive = activeTrade ? Math.abs(activeTrade.entry - activeTrade.stop) : 1
+  const unrealizedR   = riskPtsActive > 0 ? unrealizedPts / riskPtsActive : 0
+  const unrealizedPnl = activeTrade ? calcPnl(activeTrade.dir, instrument, activeTrade.entry, currentClose) : 0
+
+  const stats = sessionStats(trades)
+  const monoStyle = { fontFamily:"'JetBrains Mono',monospace" }
+
+  // ── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col md:flex-row h-full overflow-hidden bg-[#05050a]">
+    <div className="flex flex-col h-full overflow-hidden bg-[#05050a]">
 
-      {/* ── Chart side ─────────────────────────────────────────────────────── */}
-      <div className={`flex flex-col overflow-hidden transition-all ${
-        panelOpen ? 'h-[42vh] md:h-full md:flex-1' : 'flex-1 h-full'
-      }`}>
-        {/* Chart toolbar */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0 flex-wrap">
-          {/* Instrument */}
-          <div className="flex gap-1">
-            {INSTRUMENTS.map(({ label }) => (
-              <button key={label} onClick={() => { setInstrument(label); setChartKey(k => k + 1) }}
-                className={`text-[11px] font-bold px-3 py-1.5 rounded-xl border transition-all ${
-                  instrument === label
-                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
-                    : 'border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300'
-                }`} style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <div className="w-px h-4 bg-slate-800" />
-
-          {/* Timeframe */}
-          <div className="flex gap-1">
-            {TIMEFRAMES.map(t => (
-              <button key={t.value} onClick={() => { setTf(t.value); setChartKey(k => k + 1) }}
-                className={`text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border transition-all ${
-                  tf === t.value
-                    ? 'bg-slate-700 border-slate-600 text-slate-100'
-                    : 'border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300'
-                }`}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="ml-auto flex items-center gap-2">
-            <button onClick={() => setChartKey(k => k + 1)}
-              className="flex items-center gap-1 text-[10px] text-slate-600 hover:text-slate-300 px-2 py-1.5 rounded-lg hover:bg-slate-800/50 transition-all">
-              <RefreshCw size={10} /> Reload
-            </button>
-            {/* Panel toggle */}
-            <button onClick={() => setPanelOpen(o => !o)}
-              className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-slate-600 hover:text-slate-300 transition-all">
-              {panelOpen ? <PanelRightClose size={12} /> : <PanelRightOpen size={12} />}
-              <span className="hidden sm:inline">{panelOpen ? 'Hide' : 'Log'}</span>
-            </button>
-          </div>
+      {/* ── Top toolbar ──────────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-slate-800/50 bg-[#06060d] flex-shrink-0 flex-wrap">
+        {/* Instrument */}
+        <div className="flex gap-1">
+          {INSTRUMENTS.map(i => (
+            <button key={i} onClick={() => setInstrument(i)}
+              className={`text-[11px] font-bold px-2.5 py-1.5 rounded-lg border transition-all ${
+                instrument === i
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+                  : 'border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300'
+              }`} style={monoStyle}>{i}</button>
+          ))}
         </div>
 
-        {/* TV Chart */}
-        <div className="flex-1 overflow-hidden">
-          <TVChart key={`${chartKey}-${symbol}-${tf}`} symbol={symbol} interval={tf} />
+        <div className="w-px h-4 bg-slate-800" />
+
+        {/* Timeframe */}
+        <div className="flex gap-1">
+          {TIMEFRAMES.map(t => (
+            <button key={t} onClick={() => setTf(t)}
+              className={`text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border transition-all ${
+                tf === t
+                  ? 'bg-slate-700 border-slate-600 text-slate-100'
+                  : 'border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300'
+              }`}>{t}</button>
+          ))}
         </div>
 
-        {/* Mobile instruction strip */}
-        <div className="md:hidden flex items-center justify-center gap-2 px-4 py-2 bg-[#06060d] border-t border-slate-800/40 flex-shrink-0">
-          <Crosshair size={11} className="text-amber-400/60" />
-          <p className="text-[10px] text-slate-600">Scroll the chart to a setup, then log your trade below</p>
+        <div className="w-px h-4 bg-slate-800" />
+
+        {/* Date */}
+        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+          max={today()}
+          className="bg-slate-900/70 border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-300 focus:outline-none focus:border-slate-600 transition-all" />
+
+        {/* Load button */}
+        <button onClick={handleLoad} disabled={loading}
+          className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg border border-amber-500/35 bg-amber-500/12 text-amber-300 text-[11px] font-bold hover:bg-amber-500/22 transition-all disabled:opacity-50">
+          {loading ? <span className="animate-spin">⟳</span> : <Crosshair size={11} />}
+          {loading ? 'Loading…' : 'Load'}
+        </button>
+
+        {/* API key indicator */}
+        <div className="ml-auto flex items-center gap-2">
+          {showKeyInput ? (
+            <div className="flex items-center gap-1.5">
+              <input autoFocus value={keyDraft} onChange={e => setKeyDraft(e.target.value)}
+                onKeyDown={e => { if (e.key==='Enter') saveKey(); if (e.key==='Escape') setShowKeyInput(false) }}
+                placeholder="Paste Twelve Data API key…"
+                className="w-56 bg-slate-900 border border-amber-500/40 rounded-lg px-3 py-1.5 text-[11px] text-slate-100 placeholder-slate-600 focus:outline-none" />
+              <button onClick={saveKey} disabled={!keyDraft.trim()}
+                className="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 disabled:opacity-30 hover:bg-amber-500/25 transition-all">Save</button>
+              <button onClick={() => setShowKeyInput(false)}
+                className="text-[10px] text-slate-600 hover:text-slate-400 transition-colors">✕</button>
+            </div>
+          ) : (
+            <button onClick={() => { setKeyDraft(apiKey); setShowKeyInput(true) }}
+              className={`flex items-center gap-1.5 text-[10.5px] px-2.5 py-1.5 rounded-lg border transition-all ${
+                apiKey
+                  ? 'border-emerald-500/25 text-emerald-400/70 bg-emerald-500/5 hover:bg-emerald-500/10'
+                  : 'border-red-500/25 text-red-400/70 bg-red-500/5 hover:bg-red-500/10 animate-pulse'
+              }`}>
+              <KeyRound size={10} />
+              {apiKey ? 'API key ✓' : 'Add API key'}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* ── Session panel ──────────────────────────────────────────────────── */}
-      {panelOpen && (
-        <div className="flex flex-col flex-1 md:flex-none md:w-[390px] border-t md:border-t-0 md:border-l border-slate-800/50 overflow-hidden bg-[#06060d]">
+      {/* ── Main area ────────────────────────────────────────────────────────── */}
+      <div className="flex flex-1 overflow-hidden">
 
-          {/* Session selector header */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800/40 flex-shrink-0">
-            <Crosshair size={13} className="text-amber-400 flex-shrink-0" />
+        {/* ── Chart + controls ─────────────────────────────────────────────── */}
+        <div className="flex flex-col flex-1 overflow-hidden">
 
-            {creating ? (
-              /* ── Input form ── */
-              <div className="flex-1 flex gap-2">
-                <input autoFocus value={newName} onChange={e => setNewName(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter')  createSession()
-                    if (e.key === 'Escape') { setCreating(false); setNewName('') }
-                  }}
-                  placeholder="Session name (e.g. EURUSD 15m May week 1)"
-                  className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-[12px] text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
-                />
-                <button onClick={createSession} disabled={!newName.trim()}
-                  className="w-8 h-8 flex items-center justify-center rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 disabled:opacity-30 hover:bg-amber-500/25 transition-all">
-                  <Check size={13} />
-                </button>
-                {sessions.length > 0 && (
-                  <button onClick={() => { setCreating(false); setNewName('') }}
-                    className="w-8 h-8 flex items-center justify-center rounded-xl border border-slate-800 text-slate-600 hover:text-slate-300 transition-all">
-                    <X size={13} />
-                  </button>
-                )}
-              </div>
-            ) : sessions.length > 0 ? (
-              /* ── Session dropdown ── */
-              <>
-                <select
-                  value={activeId ?? ''}
-                  onChange={e => setActiveId(e.target.value)}
-                  className="flex-1 bg-transparent text-[12px] font-bold text-white focus:outline-none truncate"
-                >
-                  {sessions.map(s => (
-                    <option key={s.id} value={s.id} style={{ background: '#08080f' }}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-                <button onClick={() => setCreating(true)}
-                  className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-amber-500/30 hover:text-amber-400 transition-all flex-shrink-0">
-                  <Plus size={10} /> New
-                </button>
-                {activeSession && (
-                  <button onClick={() => { if (confirm(`Delete "${activeSession.name}"?`)) deleteSession(activeSession.id) }}
-                    className="w-7 h-7 flex items-center justify-center rounded-xl text-slate-700 hover:text-red-400 hover:bg-red-500/8 transition-all flex-shrink-0">
-                    <Trash2 size={11} />
-                  </button>
-                )}
-              </>
-            ) : (
-              /* ── No sessions yet — prompt ── */
-              <button onClick={() => setCreating(true)}
-                className="flex-1 flex items-center gap-2 text-[12px] font-semibold text-amber-400/70 hover:text-amber-300 transition-colors">
-                <Plus size={13} /> Create your first session
-              </button>
-            )}
-          </div>
-
-          {/* No session state */}
-          {!activeSession && (
-            <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/8 border border-amber-500/15 flex items-center justify-center">
-                <Crosshair size={24} className="text-amber-500/40" />
-              </div>
-              <div className="text-center">
-                <p className="text-[14px] font-bold text-slate-400 mb-1">No session yet</p>
-                <p className="text-[12px] text-slate-600 leading-relaxed max-w-[240px]">
-                  Create a session to start logging backtest trades. Scroll TradingView to any historical date and log what you see.
-                </p>
-              </div>
-              <button onClick={() => setCreating(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-[12px] font-bold hover:bg-amber-500/18 transition-all">
-                <Plus size={13} /> Start First Session
-              </button>
-            </div>
-          )}
-
-          {/* Active session content */}
-          {activeSession && (
-            <div className="flex-1 overflow-y-auto">
-              {/* Stats */}
-              <StatsBar session={activeSession} />
-
-              {/* Log trade form */}
-              <div className="border-b border-slate-800/40">
-                <button onClick={() => setLogOpen(o => !o)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800/20 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <Plus size={12} className="text-amber-400" />
-                    <span className="text-[12px] font-bold text-white">Log a Trade</span>
-                  </div>
-                  {logOpen ? <ChevronUp size={13} className="text-slate-600" /> : <ChevronDown size={13} className="text-slate-600" />}
-                </button>
-                {logOpen && (
-                  <div className="px-4 pb-4">
-                    <LogForm instrument={instrument} onLog={addTrade} />
-                  </div>
-                )}
-              </div>
-
-              {/* Trade list */}
-              <div className="px-4 py-4 space-y-2.5">
-                {activeSession.trades.length === 0 ? (
-                  <div className="text-center py-8">
-                    <BarChart2 size={24} className="text-slate-800 mx-auto mb-2" />
-                    <p className="text-[12px] text-slate-700">No trades logged yet</p>
-                    <p className="text-[11px] text-slate-800 mt-1">Scroll the chart to a setup and log it above</p>
-                  </div>
+          {/* Chart */}
+          <div className="flex-1 overflow-hidden relative">
+            {!hasData && !loading && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10">
+                {error === 'no-key' ? (
+                  <>
+                    <KeyRound size={32} className="text-amber-500/30" />
+                    <div className="text-center">
+                      <p className="text-[14px] font-bold text-slate-400 mb-1">API key required</p>
+                      <p className="text-[12px] text-slate-600 max-w-xs leading-relaxed">
+                        Get a free key at <span className="text-amber-400">twelvedata.com</span> — takes 30 seconds, 800 requests/day included free.
+                      </p>
+                    </div>
+                    <button onClick={() => { setKeyDraft(''); setShowKeyInput(true) }}
+                      className="px-5 py-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-[12px] font-bold hover:bg-amber-500/18 transition-all">
+                      Add API key →
+                    </button>
+                  </>
+                ) : error ? (
+                  <>
+                    <p className="text-[13px] font-bold text-red-400">Failed to load</p>
+                    <p className="text-[11px] text-slate-600 max-w-xs text-center">{error}</p>
+                  </>
                 ) : (
                   <>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-700">
-                      {activeSession.trades.length} Trade{activeSession.trades.length !== 1 ? 's' : ''}
-                    </p>
-                    {activeSession.trades.map(t => (
-                      <TradeCard key={t.id} trade={t}
-                        onResult={handleResult}
-                        onDelete={deleteTrade} />
-                    ))}
+                    <Crosshair size={32} className="text-slate-800" />
+                    <div className="text-center">
+                      <p className="text-[14px] font-bold text-slate-500 mb-1">Chart Replay</p>
+                      <p className="text-[12px] text-slate-700 max-w-xs">
+                        Select an instrument, timeframe, and date then hit Load.
+                      </p>
+                    </div>
                   </>
                 )}
               </div>
+            )}
+            <ReplayChart bars={bars} cursor={cursor} activeTrade={activeTrade} />
+          </div>
 
-              {/* Concept breakdown (only when enough data) */}
-              <ConceptBreakdown session={activeSession} />
+          {/* Replay controls bar */}
+          {hasData && (
+            <div className="flex items-center gap-3 px-4 py-2.5 border-t border-slate-800/50 bg-[#06060d] flex-shrink-0">
+              {/* Reset */}
+              <button onClick={() => { setPlaying(false); setCursor(Math.min(INITIAL_CONTEXT, Math.floor(bars.length/2))) }}
+                title="Reset to start"
+                className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300 transition-all">
+                <SkipBack size={12} />
+              </button>
+
+              {/* Step back */}
+              <button onClick={() => step(-1)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300 text-[11px] font-bold transition-all">
+                <ChevronLeft size={11} /> 1
+              </button>
+
+              {/* Play/Pause */}
+              <button onClick={() => setPlaying(p => !p)}
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
+                  playing
+                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+                    : 'border-slate-700 text-slate-300 hover:border-amber-500/40 hover:text-amber-300'
+                }`}>
+                {playing ? <Pause size={11} /> : <Play size={11} />}
+                {playing ? 'Pause' : 'Play'}
+              </button>
+
+              {/* Step forward */}
+              {([1,5,15] as const).map(n => (
+                <button key={n} onClick={() => step(n)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300 text-[11px] font-bold transition-all">
+                  +{n} <ChevronRight size={11} />
+                </button>
+              ))}
+
+              {/* Bar info */}
+              {barInfo && (
+                <div className="ml-auto flex items-center gap-2 text-[10.5px]" style={monoStyle}>
+                  <span className="text-slate-500">{barInfo.date}</span>
+                  <span className="text-slate-600">{barInfo.time}</span>
+                  <span className="text-slate-700">·</span>
+                  <span className="text-slate-600">{cursor}/{bars.length}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
-      )}
+
+        {/* ── Right panel ──────────────────────────────────────────────────── */}
+        <div className="w-[320px] flex-shrink-0 border-l border-slate-800/50 flex flex-col overflow-hidden bg-[#06060d]">
+
+          {!hasData ? (
+            /* Empty state */
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6">
+              <Crosshair size={28} className="text-slate-800" />
+              <p className="text-[12px] text-slate-700 text-center">Load a session to start replaying and marking trades</p>
+            </div>
+          ) : (
+            <div className="flex-1 overflow-y-auto">
+
+              {/* Current bar OHLC */}
+              {currentBar && (
+                <div className="px-4 py-3 border-b border-slate-800/40">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-600">Current Bar</span>
+                    {barInfo && <span className="text-[9.5px] text-slate-600" style={monoStyle}>{barInfo.date} · {barInfo.time}</span>}
+                  </div>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {(['open','high','low','close'] as const).map(k => (
+                      <div key={k} className="bg-slate-900/60 rounded-lg px-2 py-1.5 text-center">
+                        <p className="text-[8.5px] text-slate-600 uppercase">{k[0]}</p>
+                        <p className={`text-[11px] font-bold mt-0.5 ${k==='high'?'text-emerald-400/80':k==='low'?'text-red-400/80':'text-slate-300'}`}
+                           style={monoStyle}>
+                          {priceFmt(currentBar[k], instrument)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Active trade panel */}
+              {activeTrade ? (
+                <div className="px-4 py-3 border-b border-slate-800/40">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${activeTrade.dir==='long'?'bg-emerald-400':'bg-red-400'}`} />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+                      {activeTrade.dir === 'long' ? '↑ Long' : '↓ Short'} — Live
+                    </span>
+                  </div>
+
+                  {/* Entry / SL / TP */}
+                  <div className="grid grid-cols-3 gap-1.5 mb-3">
+                    {[
+                      { label:'Entry', val: activeTrade.entry, cls:'text-slate-300' },
+                      { label:'SL',    val: activeTrade.stop,  cls:'text-red-400' },
+                      { label:'TP',    val: activeTrade.target, cls:'text-emerald-400' },
+                    ].map(row => (
+                      <div key={row.label} className="bg-slate-900/60 rounded-lg px-2 py-1.5 text-center">
+                        <p className="text-[8.5px] text-slate-600">{row.label}</p>
+                        <p className={`text-[10.5px] font-bold mt-0.5 ${row.cls}`} style={monoStyle}>
+                          {priceFmt(row.val, instrument)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Live P&L */}
+                  <div className={`rounded-xl px-3 py-2.5 mb-3 text-center ${
+                    unrealizedPts >= 0 ? 'bg-emerald-500/8 border border-emerald-500/20' : 'bg-red-500/8 border border-red-500/20'
+                  }`}>
+                    <p className="text-[9px] text-slate-600 uppercase tracking-wider mb-1">Unrealized</p>
+                    <p className={`text-[16px] font-black ${unrealizedPts >= 0 ? 'text-emerald-400' : 'text-red-400'}`} style={monoStyle}>
+                      {unrealizedR >= 0 ? '+' : ''}{unrealizedR.toFixed(2)}R
+                    </p>
+                    <p className={`text-[11px] font-semibold mt-0.5 ${unrealizedPts >= 0 ? 'text-emerald-400/70' : 'text-red-400/70'}`} style={monoStyle}>
+                      {unrealizedPnl >= 0 ? '+' : ''}${Math.abs(unrealizedPnl).toFixed(0)}
+                    </p>
+                  </div>
+
+                  {/* Close buttons */}
+                  <div className="space-y-1.5">
+                    <button onClick={() => closeTrade(
+                      unrealizedPts >= 0 ? 'win' : 'loss',
+                      parseFloat(priceFmt(currentClose, instrument))
+                    )}
+                      className="w-full py-2 rounded-xl border border-slate-700 text-[11px] font-bold text-slate-300 hover:border-slate-500 hover:bg-slate-800/50 transition-all">
+                      Close at Current · {priceFmt(currentClose, instrument)}
+                    </button>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <button onClick={() => closeTrade('loss', activeTrade.stop)}
+                        className="py-2 rounded-xl border border-red-500/25 bg-red-500/8 text-red-300 text-[10.5px] font-bold hover:bg-red-500/15 transition-all">
+                        Close SL
+                      </button>
+                      <button onClick={() => closeTrade('win', activeTrade.target)}
+                        className="py-2 rounded-xl border border-emerald-500/25 bg-emerald-500/8 text-emerald-300 text-[10.5px] font-bold hover:bg-emerald-500/15 transition-all">
+                        Close TP
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Mark trade form */
+                <div className="px-4 py-3 border-b border-slate-800/40 space-y-2.5">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-600">Mark Trade</p>
+
+                  {/* Direction */}
+                  <div className="flex rounded-xl overflow-hidden border border-slate-800">
+                    {(['long','short'] as const).map(d => (
+                      <button key={d} onClick={() => setDir(d)}
+                        className={`flex-1 py-2 text-[11px] font-bold uppercase tracking-wide transition-all ${
+                          dir === d
+                            ? d==='long' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
+                            : 'text-slate-600 hover:text-slate-300'
+                        }`}>
+                        {d === 'long' ? '↑ Long' : '↓ Short'}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Prices */}
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[
+                      { label:'Entry', val:entryInput, set:setEntryInput, cls:'text-slate-600' },
+                      { label:'Stop',  val:stopInput,  set:setStopInput,  cls:'text-red-500/70' },
+                      { label:'TP',    val:tpInput,    set:setTpInput,    cls:'text-emerald-500/70' },
+                    ].map(f => (
+                      <div key={f.label}>
+                        <p className={`text-[8.5px] font-bold uppercase tracking-wider mb-1 ${f.cls}`}>{f.label}</p>
+                        <input value={f.val} onChange={e => f.set(e.target.value)}
+                          placeholder={instrument.includes('JPY') ? '150.000' : '1.08500'}
+                          className="w-full bg-slate-900/70 border border-slate-800 rounded-lg px-2 py-1.5 text-[11px] text-slate-100 placeholder-slate-700 focus:outline-none focus:border-slate-600 transition-all"
+                          style={monoStyle} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* R preview */}
+                  {formValid && (
+                    <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-slate-900/50 border border-slate-800/50 text-[10.5px]" style={monoStyle}>
+                      <span className="text-slate-600">Risk</span>
+                      <span className="text-red-400">{priceFmt(riskPts!, instrument)}</span>
+                      <span className="text-slate-700 mx-1">·</span>
+                      <span className="text-slate-600">Planned</span>
+                      <span className={`font-bold ${rPlanned! >= 2 ? 'text-emerald-400' : rPlanned! >= 1 ? 'text-amber-400' : 'text-red-400'}`}>
+                        {rPlanned}R
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Concepts (collapsed by default) */}
+                  <ConceptPicker selected={tradeConcepts} onChange={setTradeConcepts} />
+
+                  <textarea value={tradeNotes} onChange={e => setTradeNotes(e.target.value)}
+                    placeholder="Why did you take this?" rows={2}
+                    className="w-full bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 text-[11px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-slate-600 transition-all resize-none" />
+
+                  <button onClick={openTrade} disabled={!formValid}
+                    className="w-full py-2.5 rounded-xl border border-amber-500/35 bg-amber-500/12 text-amber-300 text-[11.5px] font-bold hover:bg-amber-500/22 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    Open Trade →
+                  </button>
+                </div>
+              )}
+
+              {/* Session stats */}
+              {trades.length > 0 && (
+                <div className="px-4 py-3 border-b border-slate-800/40 grid grid-cols-4 gap-2">
+                  {[
+                    { label:'W%',    val:`${stats.winRate}%`,   color: stats.winRate>=60?'text-emerald-400':stats.winRate>=40?'text-amber-400':'text-red-400' },
+                    { label:'Avg R', val: stats.total>0?(stats.avgR>=0?`+${stats.avgR}`:String(stats.avgR)):'—', color: stats.avgR>=0?'text-emerald-400':'text-red-400' },
+                    { label:'Total', val: stats.total>0?(stats.totalR>=0?`+${stats.totalR}`:String(stats.totalR)):'—', color: stats.totalR>=0?'text-emerald-400':'text-red-400' },
+                    { label:'W/L',   val:`${stats.wins}/${stats.losses}`, color:'text-slate-300' },
+                  ].map(s => (
+                    <div key={s.label} className="text-center">
+                      <p className="text-[8.5px] text-slate-600 uppercase tracking-wider">{s.label}</p>
+                      <p className={`text-[12px] font-black mt-0.5 ${s.color}`} style={monoStyle}>{s.val}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Trade history */}
+              <div className="px-4 py-3 space-y-2">
+                {trades.length === 0 ? (
+                  <p className="text-[11px] text-slate-700 text-center py-4">No trades yet — step through the chart and mark setups</p>
+                ) : (
+                  <>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-700">{trades.length} Trade{trades.length!==1?'s':''}</p>
+                    {trades.map(t => <TradeCard key={t.id} trade={t} onDelete={deleteTrade} />)}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
