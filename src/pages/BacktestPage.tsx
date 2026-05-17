@@ -212,6 +212,11 @@ export function BacktestPage() {
     if (result) closeTrade(result, exitPrice)
   }, [cursor]) // eslint-disable-line
 
+  // ── Auto-load on mount if API key is already configured ─────────────────────
+  useEffect(() => {
+    if (apiKey.trim()) load(instrument, tf, startDate, apiKey)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Reset cursor when new data loads ────────────────────────────────────────
   useEffect(() => {
     if (bars.length > 0) setCursor(Math.min(INITIAL_CONTEXT, Math.floor(bars.length / 2)))
