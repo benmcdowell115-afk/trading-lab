@@ -230,7 +230,7 @@ export function PropFirms() {
         <h1 className="font-black text-white mb-2" style={{ fontSize: 'clamp(22px,4vw,36px)', letterSpacing: '-1px' }}>
           Prop Firm Comparison
         </h1>
-        <p className="text-[13px] text-slate-500 max-w-md mx-auto">
+        <p className="text-[13px] text-slate-500" style={{ maxWidth: '420px', margin: '0 auto' }}>
           {FIRMS.length} futures prop firms scored for ICT and SMC traders. Real prices, real rules.
         </p>
       </div>

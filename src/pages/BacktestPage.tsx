@@ -13,11 +13,13 @@ import { POINT_VALUES } from '../hooks/useSettings'
 import type { Instrument } from '../types'
 
 // ── Constants ────────────────────────────────────────────────────────────────
+// Free TradingView symbols (continuous futures like NQ1! require Pro).
+// Cash/spot instruments mirror futures price action and work on any plan.
 const INSTRUMENTS: { label: Instrument; symbol: string }[] = [
-  { label: 'NQ', symbol: 'CME_MINI:NQ1!' },
-  { label: 'ES', symbol: 'CME_MINI:ES1!' },
-  { label: 'GC', symbol: 'COMEX:GC1!'    },
-  { label: 'SI', symbol: 'COMEX:SI1!'    },
+  { label: 'NQ', symbol: 'NASDAQ:NDX'  },   // Nasdaq 100 index  (mirrors NQ futures)
+  { label: 'ES', symbol: 'CBOE:SPX'    },   // S&P 500 index     (mirrors ES futures)
+  { label: 'GC', symbol: 'TVC:GOLD'    },   // Gold spot         (mirrors GC futures)
+  { label: 'SI', symbol: 'TVC:SILVER'  },   // Silver spot       (mirrors SI futures)
 ]
 const TIMEFRAMES = [
   { label: '1m', value: '1' }, { label: '5m', value: '5' },
