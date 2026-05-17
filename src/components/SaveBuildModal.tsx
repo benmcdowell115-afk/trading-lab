@@ -3,8 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Save } from 'lucide-react'
 import type { Build, Instrument } from '../types'
 
-const instruments: Instrument[] = ['NQ', 'ES', 'GC', 'SI']
-
+const instruments: Instrument[] = ['EURUSD','GBPUSD','USDJPY','GBPJPY','AUDUSD','NZDUSD'] as Instrument[]
 interface Props {
   open: boolean
   onClose: () => void
@@ -15,7 +14,7 @@ interface Props {
 
 export function SaveBuildModal({ open, onClose, onSave, selectedIds, existingBuild }: Props) {
   const [name, setName] = useState(existingBuild?.name ?? '')
-  const [instrument, setInstrument] = useState<Instrument>(existingBuild?.instrument ?? 'NQ')
+  const [instrument, setInstrument] = useState<Instrument>(existingBuild?.instrument ?? 'EURUSD')
   const [notes, setNotes] = useState(existingBuild?.notes ?? '')
 
   const handleSave = () => {

@@ -1,5 +1,8 @@
 export type Tier = 'basic' | 'intermediate' | 'advanced'
-export type Instrument = 'NQ' | 'ES' | 'GC' | 'SI'
+export type Instrument =
+  | 'NQ' | 'ES' | 'GC' | 'SI'                        // futures (kept for existing data)
+  | 'EURUSD' | 'GBPUSD' | 'USDJPY' | 'GBPJPY'        // major forex pairs
+  | 'AUDUSD' | 'NZDUSD' | 'USDCAD' | 'USDCHF'        // additional forex
 export type Category = 'structure' | 'liquidity' | 'entry' | 'timing' | 'bias' | 'model'
 
 export interface Synergy {

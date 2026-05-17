@@ -1,3 +1,4 @@
+import type { Instrument } from '../types'
 import type { JournalEntry } from '../hooks/useJournal'
 import { getConceptById } from '../data/concepts'
 import { POINT_VALUES } from '../hooks/useSettings'
@@ -74,7 +75,7 @@ export function JournalAnalytics({ entries }: Props) {
   })
 
   // Instrument breakdown
-  const instruments = ['NQ', 'ES', 'GC', 'SI'] as const
+  const instruments = ['EURUSD','GBPUSD','USDJPY','GBPJPY','AUDUSD','NZDUSD'] as Instrument[]
   const instStats = instruments.map(inst => {
     const ie = entries.filter(e => e.instrument === inst)
     const iw = ie.filter(e => e.result === 'win').length

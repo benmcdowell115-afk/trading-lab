@@ -8,8 +8,7 @@ import { useBuilds } from '../hooks/useBuilds'
 import { POINT_VALUES } from '../hooks/useSettings'
 import type { Instrument } from '../types'
 
-const instruments: Instrument[] = ['NQ', 'ES', 'GC', 'SI']
-
+const instruments: Instrument[] = ['EURUSD','GBPUSD','USDJPY','GBPJPY','AUDUSD','NZDUSD'] as Instrument[]
 const resultConfig = {
   win:       { label: 'Win',       icon: TrendingUp,   color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
   loss:      { label: 'Loss',      icon: TrendingDown, color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30'         },
@@ -26,7 +25,7 @@ function LogModal({ open, onClose, onSave, existing }: {
 }) {
   const { builds } = useBuilds()
   const [date,       setDate]       = useState(existing?.date       ?? new Date().toISOString().slice(0,10))
-  const [instrument, setInstrument] = useState<Instrument>(existing?.instrument ?? 'NQ')
+  const [instrument, setInstrument] = useState<Instrument>(existing?.instrument ?? 'EURUSD')
   const [direction,  setDirection]  = useState<'long'|'short'>(existing?.direction ?? 'long')
   const [result,     setResult]     = useState<'win'|'loss'|'breakeven'>(existing?.result ?? 'win')
   const [mode,       setMode]       = useState<JournalMode>(existing?.mode ?? 'live')

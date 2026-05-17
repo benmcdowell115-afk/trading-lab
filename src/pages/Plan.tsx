@@ -42,6 +42,14 @@ const SPECS: Record<Instrument, { name: string; pointValue: number; tickSize: nu
   ES: { name: 'ES S&P 500', pointValue: 50,  tickSize: 0.25, tickValue: 12.50 },
   GC: { name: 'GC Gold',    pointValue: 100, tickSize: 0.10, tickValue: 10    },
   SI: { name: 'SI Silver',  pointValue: 50,  tickSize: 0.005, tickValue: 25   },
+  EURUSD: { name: 'EUR/USD', pointValue: 10, tickSize: 0.0001, tickValue: 1 },
+  GBPUSD: { name: 'GBP/USD', pointValue: 10, tickSize: 0.0001, tickValue: 1 },
+  USDJPY: { name: 'USD/JPY', pointValue:  9, tickSize: 0.001,  tickValue: 1 },
+  GBPJPY: { name: 'GBP/JPY', pointValue:  9, tickSize: 0.001,  tickValue: 1 },
+  AUDUSD: { name: 'AUD/USD', pointValue: 10, tickSize: 0.0001, tickValue: 1 },
+  NZDUSD: { name: 'NZD/USD', pointValue: 10, tickSize: 0.0001, tickValue: 1 },
+  USDCAD: { name: 'USD/CAD', pointValue: 10, tickSize: 0.0001, tickValue: 1 },
+  USDCHF: { name: 'USD/CHF', pointValue: 10, tickSize: 0.0001, tickValue: 1 },
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -110,7 +118,7 @@ function RiskCalc({ defaultInstrument }: { defaultInstrument: Instrument }) {
     <div className="space-y-4">
       {/* Instrument */}
       <div className="grid grid-cols-4 gap-1.5">
-        {(['NQ', 'ES', 'GC', 'SI'] as Instrument[]).map(i => (
+        {(['EURUSD','GBPUSD','USDJPY','GBPJPY','AUDUSD','NZDUSD'] as Instrument[]).map(i => (
           <button
             key={i}
             onClick={() => setInst(i)}
@@ -198,7 +206,7 @@ export function Plan() {
 
   // Plan form state
   const today = new Date().toISOString().slice(0, 10)
-  const [instrument, setInstrument] = useState<Instrument>('NQ')
+  const [instrument, setInstrument] = useState<Instrument>('EURUSD')
   const [date,        setDate]       = useState(today)
   const [weeklyBias,  setWeeklyBias] = useState<Bias>('bullish')
   const [dailyBias,   setDailyBias]  = useState<Bias>('bullish')
@@ -273,7 +281,7 @@ export function Plan() {
                   <input type="date" value={date} onChange={e => setDate(e.target.value)}
                     className="bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-1.5 text-[12px] text-slate-200 focus:outline-none focus:border-slate-600 transition-all" />
                   <div className="flex gap-1.5 flex-wrap">
-                    {(['NQ', 'ES', 'GC', 'SI'] as Instrument[]).map(i => (
+                    {(['EURUSD','GBPUSD','USDJPY','GBPJPY','AUDUSD','NZDUSD'] as Instrument[]).map(i => (
                       <button key={i} onClick={() => setInstrument(i)}
                         className={`px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition-all
                           ${instrument === i ? 'bg-amber-500/15 border-amber-500/40 text-amber-300' : 'border-slate-800 text-slate-600 hover:border-slate-600'}`}
@@ -581,7 +589,7 @@ function KeyLevelsWidget({ currentInstrument }: { currentInstrument: Instrument 
           <span className="text-[11px] font-bold text-white">Key Levels</span>
         </div>
         <div className="flex gap-1">
-          {(['NQ', 'ES', 'GC', 'SI'] as Instrument[]).map(i => (
+          {(['EURUSD','GBPUSD','USDJPY','GBPJPY','AUDUSD','NZDUSD'] as Instrument[]).map(i => (
             <button key={i} onClick={() => setInst(i)}
               className={`px-1.5 py-0.5 rounded-lg border text-[9px] font-bold transition-all ${inst === i ? 'bg-amber-500/15 border-amber-500/40 text-amber-300' : 'border-slate-800 text-slate-600 hover:text-slate-400'}`}
               style={{ fontFamily: "'JetBrains Mono', monospace" }}>{i}

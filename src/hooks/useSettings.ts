@@ -10,12 +10,16 @@ export interface Settings {
 }
 
 export const POINT_VALUES: Record<Instrument, number> = {
+  // Futures (tick/point value per contract)
   NQ: 20, ES: 50, GC: 100, SI: 50,
+  // Forex (~$10 per pip per standard lot — adjust to your lot size)
+  EURUSD: 10, GBPUSD: 10, USDJPY: 9, GBPJPY: 9,
+  AUDUSD: 10, NZDUSD: 10, USDCAD: 10, USDCHF: 10,
 }
 
 const DEFAULT: Settings = {
   accountSize: 50000,
-  defaultInstrument: 'NQ',
+  defaultInstrument: 'EURUSD',
   riskPercent: 1,
 }
 

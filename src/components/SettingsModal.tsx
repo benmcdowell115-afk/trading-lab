@@ -4,8 +4,7 @@ import { X, Settings, Check, Download, Upload, AlertTriangle } from 'lucide-reac
 import { useSettings, POINT_VALUES } from '../hooks/useSettings'
 import type { Instrument } from '../types'
 
-const INSTRUMENTS: Instrument[] = ['NQ', 'ES', 'GC', 'SI']
-
+const INSTRUMENTS: Instrument[] = ['EURUSD','GBPUSD','USDJPY','GBPJPY','AUDUSD','NZDUSD'] as Instrument[]
 const BACKUP_KEYS = [
   'trading-lab-journal',
   'trading-lab-builds',

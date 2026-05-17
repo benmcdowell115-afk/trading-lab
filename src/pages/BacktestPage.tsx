@@ -13,13 +13,15 @@ import { POINT_VALUES } from '../hooks/useSettings'
 import type { Instrument } from '../types'
 
 // ── Constants ────────────────────────────────────────────────────────────────
-// OANDA CFD symbols — freely embeddable on TradingView without subscription,
-// closely track corresponding futures (NQ, ES, GC, SI).
+// FX: symbols are from TradingView's forex data feed — freely embeddable,
+// no subscription required. Standard forex pairs used in ICT methodology.
 const INSTRUMENTS: { label: Instrument; symbol: string }[] = [
-  { label: 'NQ', symbol: 'OANDA:NAS100USD' },
-  { label: 'ES', symbol: 'OANDA:SPX500USD' },
-  { label: 'GC', symbol: 'OANDA:XAUUSD'   },
-  { label: 'SI', symbol: 'OANDA:XAGUSD'   },
+  { label: 'EURUSD', symbol: 'FX:EURUSD' },
+  { label: 'GBPUSD', symbol: 'FX:GBPUSD' },
+  { label: 'USDJPY', symbol: 'FX:USDJPY' },
+  { label: 'GBPJPY', symbol: 'FX:GBPJPY' },
+  { label: 'AUDUSD', symbol: 'FX:AUDUSD' },
+  { label: 'NZDUSD', symbol: 'FX:NZDUSD' },
 ]
 const TIMEFRAMES = [
   { label: '1m', value: '1' }, { label: '5m', value: '5' },
@@ -327,7 +329,7 @@ function LogForm({
 }) {
   const [dir,      setDir]      = useState<'long' | 'short'>('long')
   const [date,     setDate]     = useState(new Date().toISOString().slice(0, 10))
-  const [inst,     setInst]     = useState<Instrument>(instrument)
+  const [inst,     setInst]     = useState<Instrument>(instrument as Instrument)
   const [entry,    setEntry]    = useState('')
   const [stop,     setStop]     = useState('')
   const [target,   setTarget]   = useState('')
@@ -386,7 +388,7 @@ function LogForm({
 
       {/* Instrument selector */}
       <div className="flex gap-1">
-        {(['NQ', 'ES', 'GC', 'SI'] as Instrument[]).map(i => (
+        {(INSTRUMENTS.map(x => x.label)).map(i => (
           <button key={i} onClick={() => setInst(i)}
             className={`flex-1 py-1.5 rounded-xl border text-[11px] font-bold transition-all ${
               inst === i
@@ -543,7 +545,7 @@ function ConceptBreakdown({ session }: { session: BacktestSession }) {
 export function BacktestPage() {
   const { sessions, activeSession, activeId, setActiveId, newSession, deleteSession, addTrade, updateTrade, deleteTrade } = useBacktest()
 
-  const [instrument, setInstrument] = useState<Instrument>('NQ')
+  const [instrument, setInstrument] = useState<Instrument>('EURUSD')
   const [tf,         setTf]         = useState('15')
   const [chartKey,   setChartKey]   = useState(0)
   const [panelOpen,  setPanelOpen]  = useState(true)

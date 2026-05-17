@@ -13,7 +13,7 @@ export interface KeyLevel {
 type LevelMap = Record<Instrument, KeyLevel[]>
 
 const KEY = 'tl:keylevels'
-const EMPTY: LevelMap = { NQ: [], ES: [], GC: [], SI: [] }
+const EMPTY: LevelMap = { NQ: [], ES: [], GC: [], SI: [], EURUSD: [], GBPUSD: [], USDJPY: [], GBPJPY: [], AUDUSD: [], NZDUSD: [], USDCAD: [], USDCHF: [] }
 
 function load(): LevelMap {
   try { return { ...EMPTY, ...JSON.parse(localStorage.getItem(KEY) ?? '{}') } }
