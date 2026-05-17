@@ -227,7 +227,7 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
     <div className="flex flex-col h-screen bg-[#05050a] overflow-hidden">
       <header className="relative flex-shrink-0 bg-[#06060d] border-b border-slate-800/50">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
-        <div className="relative flex items-center justify-between px-4 md:px-6 h-12 md:h-16">
+        <div className="relative flex items-center px-4 md:px-6 h-12 md:h-16 gap-4">
 
           {/* Logo */}
           <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
@@ -241,22 +241,22 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
             </div>
           </div>
 
-          {/* Desktop: centered clock */}
-          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
+          {/* Desktop: clock — flex-1 so it fills the middle without overlapping */}
+          <div className="hidden md:flex flex-1 justify-center items-center min-w-0">
             <KillZoneClock />
           </div>
 
           {/* Desktop: full utility buttons */}
-          <div className="hidden md:flex items-center gap-2.5 md:gap-3 flex-shrink-0">
-            <button onClick={() => setDrawdownOpen(true)}  className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/8 transition-all"><ShieldAlert size={13} /><span className="hidden lg:inline">Guard</span></button>
-            <button onClick={() => setMindsetOpen(true)}   className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-violet-500/40 hover:text-violet-400 hover:bg-violet-500/8 transition-all"><Smile size={13} /><span className="hidden lg:inline">Mindset</span></button>
-            <button onClick={() => setPropsOpen(true)}     className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all"><Building2 size={13} /><span className="hidden lg:inline">Props</span></button>
-            <button onClick={() => setQuizOpen(true)}      className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-purple-500/40 hover:text-purple-400 hover:bg-purple-500/8 transition-all"><Brain size={13} /><span className="hidden lg:inline">Quiz</span></button>
-            <button onClick={() => setRulesOpen(true)}     className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all"><Shield size={13} /><span className="hidden lg:inline">Rules</span></button>
-            <button onClick={() => setNotesOpen(true)}     className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-amber-500/40 hover:text-amber-400 hover:bg-amber-500/8 transition-all"><StickyNote size={13} /><span className="hidden lg:inline">Notes</span></button>
-            <button onClick={() => setSettingsOpen(true)}  className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-slate-500 hover:text-slate-300 hover:bg-slate-800/40 transition-all"><Settings size={13} /><span className="hidden lg:inline">Settings</span></button>
+          <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+            <button onClick={() => setDrawdownOpen(true)}  title="Guard"    className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/8 transition-all"><ShieldAlert size={12} /><span className="hidden xl:inline">Guard</span></button>
+            <button onClick={() => setMindsetOpen(true)}   title="Mindset"  className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-violet-500/40 hover:text-violet-400 hover:bg-violet-500/8 transition-all"><Smile size={12} /><span className="hidden xl:inline">Mindset</span></button>
+            <button onClick={() => setPropsOpen(true)}     title="Props"    className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/8 transition-all"><Building2 size={12} /><span className="hidden xl:inline">Props</span></button>
+            <button onClick={() => setQuizOpen(true)}      title="Quiz"     className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-purple-500/40 hover:text-purple-400 hover:bg-purple-500/8 transition-all"><Brain size={12} /><span className="hidden xl:inline">Quiz</span></button>
+            <button onClick={() => setRulesOpen(true)}     title="Rules"    className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all"><Shield size={12} /><span className="hidden xl:inline">Rules</span></button>
+            <button onClick={() => setNotesOpen(true)}     title="Notes"    className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-amber-500/40 hover:text-amber-400 hover:bg-amber-500/8 transition-all"><StickyNote size={12} /><span className="hidden xl:inline">Notes</span></button>
+            <button onClick={() => setSettingsOpen(true)}  title="Settings" className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-slate-500 hover:text-slate-300 hover:bg-slate-800/40 transition-all"><Settings size={12} /><span className="hidden xl:inline">Settings</span></button>
             {signOut && (
-              <button onClick={signOut} title={userEmail ?? 'Sign out'} className="flex items-center gap-2 text-[12px] font-semibold px-3 py-2 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all"><LogOut size={13} /><span className="hidden lg:inline">Sign out</span></button>
+              <button onClick={signOut} title={userEmail ?? 'Sign out'} className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-500 hover:border-red-500/30 hover:text-red-400 hover:bg-red-500/5 transition-all"><LogOut size={12} /><span className="hidden xl:inline">Sign out</span></button>
             )}
           </div>
 
