@@ -3,7 +3,7 @@ import {
   FlaskConical, Package, Beaker, Network,
   LayoutTemplate, BookOpen, LineChart, StickyNote,
   Shield, ClipboardCheck, Brain, CalendarDays, Settings, LogOut, BarChart2, Building2,
-  ShieldAlert, Smile, GraduationCap, Crosshair,
+  ShieldAlert, Smile, GraduationCap, Crosshair, Grid3X3, X,
 } from 'lucide-react'
 import { Landing }        from './pages/Landing'
 import { Builder }        from './pages/Builder'
@@ -51,6 +51,83 @@ const tabs: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'playbook',  label: 'Playbook',  Icon: GraduationCap  },
   { id: 'backtest',  label: 'Backtest',  Icon: Crosshair      },
 ]
+
+// Primary tabs always visible on mobile bottom bar
+const MOBILE_PRIMARY: Tab[] = ['builder', 'playbook', 'journal', 'chart']
+
+// Mobile bottom nav
+function MobileBottomNav({
+  tab, setTab,
+}: { tab: Tab; setTab: (t: Tab) => void }) {
+  const [moreOpen, setMoreOpen] = useState(false)
+  const primary   = tabs.filter(t => MOBILE_PRIMARY.includes(t.id))
+  const secondary = tabs.filter(t => !MOBILE_PRIMARY.includes(t.id))
+  const moreActive = secondary.some(t => t.id === tab)
+
+  return (
+    <>
+      {/* Bottom bar */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#06060d]/95 backdrop-blur-md border-t border-slate-800/60"
+           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="flex items-stretch">
+          {primary.map(({ id, label, Icon }) => (
+            <button key={id}
+              onClick={() => { setTab(id); setMoreOpen(false) }}
+              className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-all relative ${
+                tab === id && !moreOpen ? 'text-amber-400' : 'text-slate-600 active:text-slate-300'
+              }`}>
+              {tab === id && !moreOpen && (
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-400 rounded-full" />
+              )}
+              <Icon size={19} />
+              <span className="text-[9px] font-bold tracking-wide">{label}</span>
+            </button>
+          ))}
+          {/* More button */}
+          <button
+            onClick={() => setMoreOpen(o => !o)}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-all relative ${
+              moreOpen || moreActive ? 'text-amber-400' : 'text-slate-600 active:text-slate-300'
+            }`}>
+            {(moreOpen || moreActive) && (
+              <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-400 rounded-full" />
+            )}
+            {moreOpen ? <X size={19} /> : <Grid3X3 size={19} />}
+            <span className="text-[9px] font-bold tracking-wide">More</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* More sheet */}
+      {moreOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-30"
+          onClick={() => setMoreOpen(false)}>
+          <div
+            className="absolute inset-x-0 bg-[#08080f] border-t border-slate-800/60 p-4 pb-2 shadow-2xl"
+            style={{ bottom: `calc(56px + env(safe-area-inset-bottom))` }}
+            onClick={e => e.stopPropagation()}>
+            <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-600 mb-3 px-1">All tabs</p>
+            <div className="grid grid-cols-4 gap-2 pb-2">
+              {secondary.map(({ id, label, Icon }) => (
+                <button key={id}
+                  onClick={() => { setTab(id); setMoreOpen(false) }}
+                  className={`flex flex-col items-center gap-1.5 py-3 rounded-2xl border transition-all ${
+                    tab === id
+                      ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
+                      : 'border-slate-800/60 bg-slate-900/50 text-slate-500 active:text-slate-200 active:border-slate-600'
+                  }`}>
+                  <Icon size={17} />
+                  <span className="text-[9px] font-bold">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
 
 export default function App() {
   return <RootApp />
@@ -193,19 +270,21 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
           </div>
         </div>
         <div className="md:hidden px-5 pb-3"><KillZoneClock /></div>
-        <nav className="flex border-t border-slate-800/40 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+        {/* Desktop tab nav — hidden on mobile */}
+        <nav className="hidden md:flex border-t border-slate-800/40 overflow-x-auto [&::-webkit-scrollbar]:hidden">
           {tabs.map(({ id, label, Icon }) => (
             <button key={id} onClick={() => setTab(id)}
-              className={`flex-shrink-0 flex-1 min-w-[46px] flex items-center justify-center gap-1.5 py-2 md:py-2.5 text-[10px] md:text-[11.5px] font-semibold relative transition-all duration-150 border-b-2 px-1.5 md:px-2
+              className={`flex-shrink-0 flex-1 min-w-[46px] flex items-center justify-center gap-1.5 py-2.5 text-[11.5px] font-semibold relative transition-all duration-150 border-b-2 px-2
                 ${tab === id ? 'text-slate-100 border-amber-400 bg-slate-800/20' : 'text-slate-600 border-transparent hover:text-slate-300 hover:bg-slate-800/10'}`}>
               <Icon size={12} />
-              <span className="hidden sm:inline">{label}</span>
+              <span>{label}</span>
             </button>
           ))}
         </nav>
       </header>
 
-      <main ref={mainRef} className="flex-1 flex flex-col overflow-hidden">
+      {/* Main content — extra bottom padding on mobile for the bottom nav */}
+      <main ref={mainRef} className="flex-1 flex flex-col overflow-hidden md:pb-0 pb-14">
         {tab === 'builder'   && <Builder   initialBuild={loadedBuild} />}
         {tab === 'chart'     && <Chart />}
         {tab === 'map'       && <ConceptMap />}
@@ -225,6 +304,9 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <DrawdownGuard open={drawdownOpen} onClose={() => setDrawdownOpen(false)} />
       <MindsetCheck  open={mindsetOpen}  onClose={() => setMindsetOpen(false)} />
+
+      {/* Mobile bottom nav */}
+      <MobileBottomNav tab={tab} setTab={setTab} />
 
       {/* Prop Firms modal */}
       {propsOpen && (

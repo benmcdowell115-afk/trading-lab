@@ -690,6 +690,27 @@ export const concepts: Concept[] = [
     ],
   },
   {
+    id: 'cisd',
+    name: 'Change in State of Delivery (CISD)',
+    shortName: 'CISD',
+    tier: 'advanced',
+    category: 'entry',
+    description:
+      'Change in State of Delivery — the moment the algorithm shifts from one directional delivery to another, confirmed by a candle closing through a recent swing point with momentum. On the 1m chart, a CISD is your entry trigger: after all HTF confluence is in place (PD array, kill zone, DOL), the CISD is the lowest-timeframe confirmation that delivery has actually flipped. A bullish CISD: a 1m candle closes above the most recent 1m swing high after SSL was swept. Bearish CISD: closes below the most recent swing low after BSL was swept.',
+    howToUse:
+      'Set up all HTF confluence first (4H/1H OB or FVG, daily bias, kill zone, DOL identified). Drop to 1m. Wait for a liquidity sweep (SSL for longs, BSL for shorts). The CISD is the first candle that closes above the most recent 1m swing high (bullish) or below the most recent 1m swing low (bearish). This candle IS the entry signal. Stop goes below the sweep wick. Target is the nearest opposing liquidity. CISD without HTF confluence is noise — always qualify it top-down.',
+    instruments: ['NQ', 'ES', 'GC', 'SI'],
+    tags: ['CISD', 'delivery', 'state change', '1m', 'trigger', 'flip', 'CHoCH', 'entry confirmation'],
+    synergies: [
+      { conceptId: 'market-structure', strength: 3, note: 'CISD is a micro-CHoCH — the structural shift on the 1m that confirms the larger timeframe intent.' },
+      { conceptId: 'rejection-block', strength: 3, note: 'The CISD candle often forms directly on or within a rejection block — two confirmations stacked.' },
+      { conceptId: 'displacement', strength: 3, note: 'CISD IS a form of displacement — the delivery-change candle must close through the swing with momentum.' },
+      { conceptId: 'liquidity', strength: 2, note: 'CISD only has meaning after a liquidity sweep — the sweep creates the conditions for the delivery flip.' },
+      { conceptId: 'kill-zones', strength: 2, note: 'CISD within a kill zone (10AM–11AM, 2PM–3PM) is highest probability — time + delivery confirmation.' },
+      { conceptId: 'silver-bullet', strength: 2, note: 'Silver Bullet entries are often triggered by a CISD within the 10–11AM window.' },
+    ],
+  },
+  {
     id: 'iofed',
     name: 'ICT Entry Drill (IOFED)',
     shortName: 'IOFED',

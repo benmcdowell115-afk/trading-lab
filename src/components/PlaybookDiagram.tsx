@@ -357,12 +357,115 @@ const SCENES: Record<string, (dir:'long'|'short') => Scene> = {
       arrows: [{ x:124,y:76,dir:'down',color:BEAR,label:'ENTRY' }],
     }
   },
+
+  // ── CISD (Change in State of Delivery) ──────────────────────────────────────
+  cisd(dir) {
+    return dir === 'long' ? {
+      // SSL sweep → CISD candle closes above swing high → long
+      candles: [
+        // bearish pressure before sweep
+        [10,32,48,27,52],[36,46,60,41,64],[62,58,72,53,76],
+        [88,70,84,65,88],
+        // sweep wick — long bearish candle breaks to new low (SSL taken)
+        [114,82,110,80,122],
+        // CISD candle — big bull close above the swing high
+        [140,108,62,106,64],
+        // continuation
+        [166,64,44,38,66],[192,44,26,20,46],[218,27,12,8,28],
+      ],
+      zones: [
+        { x:0,  y:75,w:130,h:10,type:'red',   label:'SSL'  },
+        { x:130,y:54,w:130,h:22,type:'green',  label:'CISD zone' },
+      ],
+      lines: [
+        { x1:0,y1:72,x2:260,y2:72,color:'rgba(248,113,113,0.5)',dashed:true,label:'Swing low', lx:2,ly:70 },
+        { x1:114,y1:66,x2:260,y2:66,color:'rgba(52,211,153,0.5)',dashed:true,label:'Swing high',lx:118,ly:64 },
+      ],
+      arrows: [{ x:176,y:34,dir:'up',color:BULL,label:'ENTRY' }],
+      badges: [
+        { x:140,y:48,text:'CISD ↑',bg:'rgba(52,211,153,0.25)',fg:'#34d399' },
+        { x:114,y:132,text:'SSL SWEPT',bg:'rgba(248,113,113,0.2)',fg:'#f87171' },
+      ],
+    } : {
+      // BSL sweep → CISD candle closes below swing low → short
+      candles: [
+        // bullish pressure before sweep
+        [10,108,92,88,113],[36,94,80,77,98],[62,82,68,65,86],
+        [88,70,56,53,74],
+        // sweep wick — big bull candle breaks to new high (BSL taken)
+        [114,58,30,28,60],
+        // CISD candle — big bear close below swing low
+        [140,32,80,30,82],
+        // continuation down
+        [166,78,96,74,100],[192,94,110,90,114],[218,108,122,105,126],
+      ],
+      zones: [
+        { x:0,  y:45,w:130,h:10,type:'green', label:'BSL'  },
+        { x:130,y:60,w:130,h:22,type:'red',   label:'CISD zone' },
+      ],
+      lines: [
+        { x1:0,y1:50,x2:260,y2:50,color:'rgba(52,211,153,0.5)',dashed:true,label:'Swing high',lx:2,ly:48 },
+        { x1:114,y1:66,x2:260,y2:66,color:'rgba(248,113,113,0.5)',dashed:true,label:'Swing low',lx:118,ly:64 },
+      ],
+      arrows: [{ x:176,y:122,dir:'down',color:BEAR,label:'ENTRY' }],
+      badges: [
+        { x:140,y:72,text:'CISD ↓',bg:'rgba(248,113,113,0.25)',fg:'#f87171' },
+        { x:114,y:18,text:'BSL SWEPT',bg:'rgba(52,211,153,0.2)',fg:'#34d399' },
+      ],
+    }
+  },
+
+  // ── Rejection Block (dedicated — not aliased) ─────────────────────────────
+  'rejection-block-scene'(dir) {
+    return dir === 'long' ? {
+      // Long wick down = sell-side absorption (rejection block below)
+      candles: [
+        [10,55,72,50,78],[36,70,84,64,88],[62,82,72,68,88],
+        // rejection candle: small body, massive bearish wick
+        [88,75,70,68,112],
+        // reaction back up from body zone
+        [114,72,58,56,76],[140,60,44,38,62],
+        [166,44,30,24,46],[192,30,16,10,32],[218,18,8,4,20],
+      ],
+      zones: [{ x:80,y:66,w:44,h:10,type:'amber',label:'RB BODY' }],
+      lines: [
+        { x1:80,y1:68,x2:260,y2:68,color:'rgba(245,158,11,0.5)',dashed:true,label:'Body high',lx:82,ly:66 },
+        { x1:80,y1:76,x2:260,y2:76,color:'rgba(245,158,11,0.5)',dashed:true,label:'Body low',lx:82,ly:80 },
+        { x1:98,y1:112,x2:98,y2:76,color:'rgba(248,113,113,0.6)',dashed:false },
+      ],
+      arrows: [{ x:155,y:18,dir:'up',color:BULL,label:'ENTRY' }],
+      badges: [
+        { x:88,y:121,text:'WICK = SSL SWEPT',bg:'rgba(248,113,113,0.2)',fg:'#f87171' },
+        { x:114,y:48,text:'ENTRY AT CE',bg:'rgba(245,158,11,0.25)',fg:'#f59e0b' },
+      ],
+    } : {
+      candles: [
+        [10,85,68,62,90],[36,70,55,50,74],[62,57,70,52,74],
+        // rejection candle: small body, massive bullish wick
+        [88,65,70,28,72],
+        // reaction back down from body zone
+        [114,68,82,64,86],[140,80,96,75,100],
+        [166,94,108,90,112],[192,106,120,102,124],[218,118,130,114,134],
+      ],
+      zones: [{ x:80,y:62,w:44,h:10,type:'amber',label:'RB BODY' }],
+      lines: [
+        { x1:80,y1:64,x2:260,y2:64,color:'rgba(245,158,11,0.5)',dashed:true,label:'Body high',lx:82,ly:62 },
+        { x1:80,y1:72,x2:260,y2:72,color:'rgba(245,158,11,0.5)',dashed:true,label:'Body low',lx:82,ly:76 },
+        { x1:98,y1:28,x2:98,y2:64,color:'rgba(52,211,153,0.6)',dashed:false },
+      ],
+      arrows: [{ x:155,y:130,dir:'down',color:BEAR,label:'ENTRY' }],
+      badges: [
+        { x:88,y:18,text:'WICK = BSL SWEPT',bg:'rgba(52,211,153,0.2)',fg:'#34d399' },
+        { x:114,y:84,text:'ENTRY AT CE',bg:'rgba(245,158,11,0.25)',fg:'#f59e0b' },
+      ],
+    }
+  },
 }
 
 // Aliases
 SCENES['silver-bullet']        = SCENES['ict-macros']
 SCENES['key-opens']            = SCENES['ict-macros']
-SCENES['rejection-block']      = SCENES['order-block']
+SCENES['rejection-block']      = SCENES['rejection-block-scene']
 SCENES['mitigation-block']     = SCENES['order-block']
 SCENES['equal-highs-lows']     = SCENES['liquidity']
 SCENES['inducement']           = SCENES['liquidity']
