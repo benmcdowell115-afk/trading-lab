@@ -1,6 +1,7 @@
 import { useKillZone } from '../hooks/useKillZone'
 import { Clock, Zap } from 'lucide-react'
 
+/** Full-width clock for desktop header centre */
 export function KillZoneClock() {
   const { time, active, next, nextMacro, timeLeft, timeToNext, timeToMacro } = useKillZone()
 
@@ -63,6 +64,37 @@ export function KillZoneClock() {
         </div>
       </div>
 
+    </div>
+  )
+}
+
+/** Compact single-line clock strip for mobile header */
+export function KillZoneClockCompact() {
+  const { active, next, nextMacro, timeLeft, timeToNext, timeToMacro } = useKillZone()
+
+  return (
+    <div className="flex items-center gap-2 text-[10px] font-semibold">
+      {/* Zone pill */}
+      {active ? (
+        <span className="flex items-center gap-1" style={{ color: active.textColor }}>
+          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse" style={{ backgroundColor: active.color }} />
+          {active.shortName ?? active.name}
+          <span className="text-slate-600 font-normal">{timeLeft}</span>
+        </span>
+      ) : (
+        <span className="flex items-center gap-1 text-slate-600">
+          <span className="w-1.5 h-1.5 rounded-full bg-slate-700 flex-shrink-0" />
+          <span style={{ color: next.zone.textColor }}>{next.zone.shortName}</span>
+          <span className="text-slate-700">in {timeToNext}</span>
+        </span>
+      )}
+      <span className="text-slate-800">·</span>
+      {/* Macro */}
+      <span className="flex items-center gap-1 text-slate-600">
+        <Zap size={9} className="text-amber-500/60 flex-shrink-0" />
+        <span className="text-amber-400/80">{nextMacro.name}</span>
+        <span className="text-slate-700">in {timeToMacro}</span>
+      </span>
     </div>
   )
 }

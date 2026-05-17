@@ -18,7 +18,7 @@ import { RecapPage }      from './recap/RecapPage'
 import { Playbook }       from './pages/Playbook'
 import { BacktestPage }   from './pages/BacktestPage'
 import { PropFirms }      from './pages/PropFirms'
-import { KillZoneClock }  from './components/KillZoneClock'
+import { KillZoneClock, KillZoneClockCompact } from './components/KillZoneClock'
 import { SessionNotes }   from './components/SessionNotes'
 import { TradingRules }   from './components/TradingRules'
 import { QuizModal }      from './components/QuizModal'
@@ -260,9 +260,8 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
             )}
           </div>
 
-          {/* Mobile: clock inline + single tools button */}
+          {/* Mobile: just the ⋮ tools button — clock gets its own row below */}
           <div className="flex md:hidden items-center gap-2 flex-shrink-0">
-            <div className="scale-90 origin-right"><KillZoneClock /></div>
             <button
               onClick={() => setMobileToolsOpen(o => !o)}
               className={`flex items-center justify-center w-8 h-8 rounded-xl border transition-all ${
@@ -296,6 +295,11 @@ function AppShell({ signOut, userEmail }: { signOut?: () => void; userEmail?: st
             </div>
           </div>
         )}
+        {/* Mobile compact clock row */}
+        <div className="md:hidden flex items-center px-4 pb-2 pt-0.5 gap-2">
+          <KillZoneClockCompact />
+        </div>
+
         {/* Desktop tab nav */}
         <nav className="hidden md:flex border-t border-slate-800/40 overflow-x-auto [&::-webkit-scrollbar]:hidden">
           {tabs.map(({ id, label, Icon }) => (
